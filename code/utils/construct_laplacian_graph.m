@@ -8,16 +8,16 @@ function L = construct_laplacian_graph(data_name, X_train, K)
         if ~exist(['../data/',data_name], 'dir')
             mkdir(['../data/',data_name]);
         end
-        n_sample=size(X_train,1);
+        n_sample=size(X_train, 2);
         % knn
         start=tic();
-        knn=knnsearch(X_train,X_train,'K',K+1);
+        knn=knnsearch(X_train', X_train','K',K+1);
         time=toc(start);
         disp([num2str(K), '-NN using: ', num2str(time)]);
 
         p_sigma = 0;
         for i_sample = 1 : n_sample
-            p_sigma = p_sigma + norm(X_train(i_sample,:)-X_train(knn(i_sample, end),:), 2) / n_sample;
+            p_sigma = p_sigma + norm(X_train(:, i_sample)-X_train(:, knn(i_sample, end)), 2) / n_sample;
         end
 
         %% directed graph -------
@@ -27,9 +27,9 @@ function L = construct_laplacian_graph(data_name, X_train, K)
                 col=knn(i,j);
                 if ~W(i,col)
                     if ismember(i, knn(col, :))
-                        W(i,col) = 2*exp(-norm(X_train(i,:)-X_train(col,:), 2)^2/p_sigma^2);
+                        W(i,col) = 2*exp(-norm(X_train(:, i)-X_train(:, col), 2)^2/p_sigma^2);
                     else
-                        W(i,col) = exp(-norm(X_train(i,:)-X_train(col,:), 2)^2/p_sigma^2);
+                        W(i,col) = exp(-norm(X_train(:, i)-X_train(:, col), 2)^2/p_sigma^2);
                     end
                     W(col,i)=W(i,col);
                 end
