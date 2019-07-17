@@ -2,12 +2,15 @@
 % y : K*(n+u)
 addpath('./utils/');
 addpath('./core_functions/');
+
 clear;
 rng('default');
 
 dataset = 'aloi';
 [X, y] = load_data(char(dataset));
+tic;
 L = construct_laplacian_graph(char(dataset), X, 10);
+toc
 
 total_size = size(X, 2);
 train_idx = randperm(total_size, ceil(total_size*0.7));
