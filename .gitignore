@@ -1,0 +1,9 @@
+data/
+good_result/
+tmp/
+datasets/
+result/
+libsvm/
+
+*.xlsx
+*.txt
