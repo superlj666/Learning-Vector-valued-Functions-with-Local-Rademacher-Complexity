@@ -28,9 +28,10 @@ function model = ps3vt_multi_train(XLX, X_train, y_train, model)
     tic();
     %rng('default');
 
-    n_dimension = size(X_train, 2);
-    n_class = max(y_train);
-    n_sample = numel(y_train);
+    n_dimension = size(X_train, 1);
+    n_sample = size(X_train, 2);
+    n_class = size(y_train, 1);
+    
     if ~isfield(model, 'tau_A'), model.tau_A = 0; end
     if ~isfield(model, 'tau_I'), model.tau_I = 1e-8; end
     if ~isfield(model, 'tau_S'), model.tau_S = 1e-6; end
@@ -42,9 +43,11 @@ function model = ps3vt_multi_train(XLX, X_train, y_train, model)
     if ~isfield(model, 'epoch'), model.epoch = 0; end
     if ~isfield(model, 'time_train'), model.time_train = 0; end    
  
-    W = zeros(n_dimension, n_class);
+    W = rand(n_dimension, n_class);
     
     converge = false;
+    
+    G = 0;
     for epoch = 1 : model.T
         model.epoch = model.epoch + 1;
         idx_rand = randperm(n_sample);
@@ -56,33 +59,36 @@ function model = ps3vt_multi_train(XLX, X_train, y_train, model)
         for i_batch = 1 : ceil(n_sample / model.n_batch)
             grad_g = zeros(n_dimension, n_class);
             model.iter_batch = model.iter_batch + 1;
-            i_step = model.step / (model.iter_batch +  n_sample);
             
             for i_sample = (i_batch - 1) * model.n_batch + 1 : min(i_batch * model.n_batch, n_sample)
                 i_idx = idx_rand(i_sample);
 
                 % find true margin and predict margin
-                h_x = W' * X_train(i_idx, : )';
-                margin_true = h_x(y_train(i_idx));
-                h_x(y_train(i_idx)) = -Inf;
-                [margin_pre, loc_pre] = max(h_x);
+                h_x = W' * X_train(:, i_idx);
+                label_true = find(y_train(:, i_idx), 1);
+                margin_true = h_x(label_true);
+                h_x(label_true) = -Inf;
+                [margin_subopt, label_subopt] = max(h_x);
 
                 % rough estimation of loss and error for every epoch
-                errTot = errTot + (margin_true <= margin_pre);
-                lossTot = lossTot + max(1-margin_true + margin_pre, 0);
+                errTot = errTot + (margin_true <= margin_subopt);
+                lossTot = lossTot + max(1-margin_true + margin_subopt, 0);
                 
                 % calculate gradient for every instance
-                if margin_true-margin_pre < 1
-                    grad_g( : , y_train(i_idx)) = grad_g( : , y_train(i_idx))-X_train(i_idx, : )';
-                    grad_g( : , loc_pre) = grad_g( : , loc_pre) + X_train(i_idx, : )';
+                if margin_true-margin_subopt < 1
+                    y_subopt = zeros(n_class, 1);
+                    y_subopt(label_subopt, 1) = 1;
+                    grad_g  = grad_g + X_train(:, i_idx)*(y_subopt - y_train(:, i_idx))';
                     n_update = n_update + 1;
                 end
             end
             % update gradient for every batch
             grad_g = grad_g ./ model.n_batch + 2 * model.tau_A  * W + 2 * model.tau_I * XLX * W;
+            G = model.xi*G + (1-model.xi)*norm(grad_g, 'fro')^2;
             
-            W = W - i_step * grad_g;
-            W = min(1, 1 / (sqrt(model.tau_A) * norm(W, 'fro'))) * W;
+            i_step = model.step/sqrt(G + 1e-6);
+            W = W - i_step* grad_g;
+            W = min(1, 1 / p_q_norm(W, 2, 1)) * W;
 
             % SVT with proximal gradient
             S = zeros(n_dimension, n_class);
@@ -96,7 +102,7 @@ function model = ps3vt_multi_train(XLX, X_train, y_train, model)
             end
             model.S = S;
 
-            if isfield(model, 'n_record_batch') && (ismember(model.iter_batch, model.n_record_batch) ...
+            if isfield(model, 'n_record_batch') && (mod(model.iter_batch, model.n_record_batch)==0 ...
                 || (epoch == model.T && i_batch == ceil(n_sample / model.n_batch)))
                 model.time_train = model.time_train + toc();
                 model.weights = W;
