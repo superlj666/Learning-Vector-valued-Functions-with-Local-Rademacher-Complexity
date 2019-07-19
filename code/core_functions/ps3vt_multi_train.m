@@ -8,7 +8,7 @@ function model = ps3vt_multi_train(XLX, X_train, y_train, model)
 %
 %   Additional parameters :
 %   - model.model.tau_A  is the weight of the frobenius norm term of weight matrix W. It regulates
-%     the complexity of the model.
+%     the complexity of the model.   
 %     Default value is 0.01.
 %   - model.model.tau_I is the weight of the trace norm term of Laplacain regularization. It regulates
 %     the influnce of unlabeled data.
@@ -36,14 +36,19 @@ if ~isfield(model, 'tau_A'), model.tau_A = 0; end
 if ~isfield(model, 'tau_I'), model.tau_I = 1e-8; end
 if ~isfield(model, 'tau_S'), model.tau_S = 1e-6; end
 if ~isfield(model, 'tail_start'), model.tail_start = ceil(min(n_class, n_dimension) * 0.5); end
-if ~isfield(model, 'step'), model.step = 1 / model.tau_A; end
+if ~isfield(model, 'xi'), model.xi = 0.5; end
+if ~isfield(model, 'varepsilon'), model.varepsilon = 1e-2; end
 if ~isfield(model, 'n_batch'), model.n_batch = 32; end
 if ~isfield(model, 'T'), model.T = 30; end
 if ~isfield(model, 'iter_batch'), model.iter_batch = 0; end
 if ~isfield(model, 'epoch'), model.epoch = 0; end
 if ~isfield(model, 'time_train'), model.time_train = 0; end
 
-W = rand(n_dimension, n_class);
+if isa(X_train, 'gpuArray')
+    W = gpuArray.rand(n_dimension, n_class);
+else
+    W = rand(n_dimension, n_class);
+end
 
 converge = false;
 
@@ -58,7 +63,11 @@ for epoch = 1 : model.T
     n_update = 0;
     
     for i_batch = 1 : ceil(n_sample / model.n_batch)
-        grad_g = zeros(n_dimension, n_class);
+        if isa(X_train, 'gpuArray')
+            grad_g = zeros(n_dimension, n_class, 'gpuArray');
+        else
+            grad_g = zeros(n_dimension, n_class);
+        end
         model.iter_batch = model.iter_batch + 1;
         
         for i_sample = (i_batch - 1) * model.n_batch + 1 : min(i_batch * model.n_batch, n_sample)
@@ -97,7 +106,7 @@ for epoch = 1 : model.T
             for i_diag = model.tail_start : min(n_dimension, n_class)
                 S(i_diag, i_diag) = max(0, S(i_diag, i_diag)-i_step * model.tau_S);
             end
-            W = U * S * V';
+            W = (U * S) * V';
         end
         model.S = S;
         

@@ -15,6 +15,7 @@ toc
 total_size = size(X, 2);
 train_idx = randperm(total_size, ceil(total_size*0.7));
 test_idx = setdiff(1:total_size, train_idx);
+X = random_fourier_features(X, 500, 2);
 X_train = X(:, train_idx);
 y_train = y(:, train_idx);
 X_test = X(:, test_idx);
@@ -23,9 +24,9 @@ y_test = y(:, test_idx);
 XLX = X(:, train_idx)*L(train_idx, train_idx)*X(:, train_idx)';
 
 model.data_name = char(dataset);
-model.tau_I = 0;%1e-09;
-model.tau_A = 0;%1e-5;
-model.tau_S = 0;%1e-5;
+model.tau_I = 0;1e-5;
+model.tau_A = 1e-5;
+model.tau_S = 0;1e-5;
 model.varepsilon = 1e-2;
 model.xi = 0.5;
 model.n_batch = 32;
@@ -36,4 +37,4 @@ model.test_batch = true;
 model.X_test = X_test;
 model.y_test = y_test;
 model = ps3vt_multi_train(XLX, X_train, y_train, model);
-model
+mean(model.test_err(end-5:end))

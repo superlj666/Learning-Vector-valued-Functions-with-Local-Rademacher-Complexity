@@ -31,18 +31,18 @@ for i_sample = 1 : numel(y)
 end
 
 if strcmpi(type, 'test')
-    model.test_err(end + 1) = err/numel(y);
-    model.test_loss(end + 1) = loss/numel(y);
-    model.test_complexity(end + 1) = model.tau_A * norm(model.weights, 'fro')^2;
-    model.test_unlabeled(end + 1) = model.tau_I * trace(model.weights' * XLX * model.weights);
-    model.test_trace(end + 1) =  model.tau_S * sum(sqrt(eig(model.S' * model.S)));
-    model.test_objective(end + 1) = model.test_loss(end) + model.test_complexity(end) + model.test_unlabeled(end) + model.test_trace(end);
+    model.test_err(end + 1) = gather(err/numel(y));
+    model.test_loss(end + 1) = gather(loss/numel(y));
+    model.test_complexity(end + 1) = gather(model.tau_A * norm(model.weights, 'fro')^2);
+    model.test_unlabeled(end + 1) = gather(model.tau_I * trace(model.weights' * XLX * model.weights));
+    model.test_trace(end + 1) =  gather(model.tau_S * sum(sqrt(eig(model.S' * model.S))));
+    model.test_objective(end + 1) = gather(model.test_loss(end) + model.test_complexity(end) + model.test_unlabeled(end) + model.test_trace(end));
 elseif strcmpi(type, 'train')
-    model.train_err(end + 1) = err/numel(y);
-    model.train_loss(end + 1) = loss/numel(y);
-    model.train_complexity(end + 1) = model.tau_A * norm(model.weights, 'fro')^2;
-    model.train_unlabeled(end + 1) = model.tau_I * trace(model.weights' * XLX * model.weights);
-    model.train_trace(end + 1) =  model.tau_S * sum(sqrt(eig(model.S' * model.S)));
-    model.train_objective(end + 1) = model.train_loss(end) + model.train_complexity(end) + model.train_unlabeled(end) + model.train_trace(end);
+    model.train_err(end + 1) = gather(err/numel(y));
+    model.train_loss(end + 1) = gather(loss/numel(y));
+    model.train_complexity(end + 1) = gather(model.tau_A * norm(model.weights, 'fro')^2);
+    model.train_unlabeled(end + 1) = gather(model.tau_I * trace(model.weights' * XLX * model.weights));
+    model.train_trace(end + 1) =  gather(model.tau_S * sum(sqrt(eig(model.S' * model.S))));
+    model.train_objective(end + 1) = gather(model.train_loss(end) + model.train_complexity(end) + model.train_unlabeled(end) + model.train_trace(end));
 end
 end
