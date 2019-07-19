@@ -101,7 +101,7 @@ for epoch = 1 : model.T
         end
         model.S = S;
         
-            if isfield(model, 'n_record_batch') && (ismember(model.iter_batch, model.n_record_batch) ...
+        if isfield(model, 'n_record_batch') && (ismember(model.iter_batch, model.n_record_batch) ...
                 || (epoch == model.T && i_batch == ceil(n_sample / model.n_batch)))
             model.time_train = model.time_train + toc();
             model.weights = W;
