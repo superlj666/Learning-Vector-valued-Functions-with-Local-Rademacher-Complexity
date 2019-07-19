@@ -13,7 +13,7 @@ load(['../result/', data_name, '_models.mat'], 'model_linear', 'model_lrc', 'mod
 
 % load datasets
 [X, y] = load_data(data_name);
-sigma = select_gaussian_kernel(data_name, model_lrc_ssl);
+sigma = 2^1.3;select_gaussian_kernel(data_name, model_lrc_ssl)
 X_rf_100 = random_fourier_features(X, 100, sigma);
 X_rf_500 = random_fourier_features(X, 500, sigma);
 L = construct_laplacian_graph(data_name, X, 10);
