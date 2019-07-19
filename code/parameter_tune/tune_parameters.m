@@ -9,7 +9,7 @@ for dataset = datasets
     L = construct_laplacian_graph(char(dataset), X, 10);
 
     % cross validation to choose parameters
-    if(use_gpu)%%
+    if(model.use_gpu)%%
         X = full(gpuArray(X));
         y = gpuArray(y);
     end

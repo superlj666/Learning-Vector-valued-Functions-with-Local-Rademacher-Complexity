@@ -6,8 +6,13 @@ addpath('./core_functions/');
 clear;
 rng('default');
 
-dataset = 'pendigits';
+dataset = 'covtype';
+model.use_gpu = true;
+
 [X, y] = load_data(char(dataset));
+if(model.use_gpu)
+    X = full(gpuArray(X));
+end
 tic;
 L = construct_laplacian_graph(char(dataset), X, 10);
 toc
@@ -15,7 +20,7 @@ toc
 total_size = size(X, 2);
 train_idx = randperm(total_size, ceil(total_size*0.7));
 test_idx = setdiff(1:total_size, train_idx);
-X = random_fourier_features(X, 500, 2);
+%X = random_fourier_features(X, 500, 2);
 X_train = X(:, train_idx);
 y_train = y(:, train_idx);
 X_test = X(:, test_idx);
