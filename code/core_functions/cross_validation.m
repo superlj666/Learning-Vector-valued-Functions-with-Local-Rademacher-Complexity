@@ -9,7 +9,7 @@ function errors_validate = cross_validation(L, X_train, y_train, model)
     can_step = model.can_step;
 
     % data split
-    n_samples = numel(y_train);
+    n_samples = size(X_train, 2);
     idx_rand = randperm(n_samples);
     step_fold = ceil(n_samples / n_folds);
     folds_XLX = cell(n_folds, 1);
@@ -21,10 +21,10 @@ function errors_validate = cross_validation(L, X_train, y_train, model)
         i_fold_train = setdiff(idx_rand, folds_validate{i_fold, 1});
         i_fold_train = i_fold_train(randperm(numel(i_fold_train)));
         
-        folds_XLX{i_fold, 1} = X_train(i_fold_train, :)' * L(i_fold_train, i_fold_train) * X_train(i_fold_train, :);
+        folds_XLX{i_fold, 1} = X_train(:, i_fold_train) * L(i_fold_train, i_fold_train) * X_train(:, i_fold_train)';
 
         % a part of i-th fold data as labeled data
-        idx_labeled = sampling_with_labels(y_train(i_fold_train), rate_labeled);
+        idx_labeled = sampling_with_labels(y_train(:, i_fold_train), rate_labeled);
         folds_train_labeled{i_fold, 1} = i_fold_train(idx_labeled);
         % folds_train_labeled{i_fold, 1} = i_fold_train(1 : ceil(numel(i_fold_train) * rate_labeled));
     end
@@ -50,9 +50,9 @@ function errors_validate = cross_validation(L, X_train, y_train, model)
                         i_model.n_record_batch = ceil(numel(folds_train_labeled{i_fold, 1}) / i_model.n_batch * 0.5) : 100 ...
                         : ceil(numel(folds_train_labeled{i_fold, 1}) / i_model.n_batch) * model.T;
                         i_model.test_batch = true;
-                        i_model.X_test = X_train(folds_validate{i_fold, 1}, :);
-                        i_model.y_test = y_train(folds_validate{i_fold, 1});
-                        i_model = ps3vt_multi_train(XLX, X_train(folds_train_labeled{i_fold, 1}, :), y_train(folds_train_labeled{i_fold, 1}), i_model);
+                        i_model.X_test = X_train(:, folds_validate{i_fold, 1});
+                        i_model.y_test = y_train(:, folds_validate{i_fold, 1});
+                        i_model = ps3vt_multi_train(XLX, X_train(:, folds_train_labeled{i_fold, 1}), y_train(:, folds_train_labeled{i_fold, 1}), i_model);
                         test_errs(i_fold) = mean(i_model.test_err);
 
                         % i_model = model;

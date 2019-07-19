@@ -15,29 +15,14 @@ function L = construct_laplacian_graph(data_name, X_train, K)
         time=toc(start);
         disp([num2str(K), '-NN using: ', num2str(time)]);
 
-        p_sigma = 0;
-        for i_sample = 1 : n_sample
-            p_sigma = p_sigma + norm(X_train(:, i_sample)-X_train(:, knn(i_sample, end)), 2) / n_sample;
-        end
-
-        %% directed graph -------
+       %% directed graph -------
         W=sparse(n_sample, n_sample);
-        for i=1:n_sample
-            for j=2:K+1
-                col=knn(i,j);
-                if ~W(i,col)
-                    if ismember(i, knn(col, :))
-                        W(i,col) = 2*exp(-norm(X_train(:, i)-X_train(:, col), 2)^2/p_sigma^2);
-                    else
-                        W(i,col) = exp(-norm(X_train(:, i)-X_train(:, col), 2)^2/p_sigma^2);
-                    end
-                    W(col,i)=W(i,col);
-                end
-            end
+
+        for col=1:n_sample
+            W(col, knn(col, :))= true;
         end
-        %D=sum(W)';
-        % D=spdiags(sqrt(1./D), 0, n_sample, n_sample);
-        % L=speye(n_sample)-D*W*D;
+        W = W&W';
+        
         D = spdiags(sum(W)', 0, n_sample, n_sample);
         L = D - W;
         save(str, 'L');

@@ -20,9 +20,9 @@ out = model.weights' * X;
 loss = 0;
 err = 0;
 
-for i_sample = 1 : size(y, 2)
+for i_sample = 1 : numel(y)
     h_x = out( : ,i_sample);
-    label_true = find(y(:, i_sample), 1);
+    label_true = y(i_sample);
     margin_true = h_x(label_true);
     h_x(label_true) = -Inf;
     [margin_subopt, label_subopt] = max(h_x);

@@ -1,11 +1,11 @@
 %addpath('../libsvm/matlab/');
-addpath('./utils/');
-addpath('./core_functions/');
+addpath('../utils/');
+addpath('../core_functions/');
 clear;
 rng('default');
 
 datasets = {
-%'iris', ...
+'iris', ...
 %'wine', ...
 %'glass', ...
 % 'svmguide2', ...
@@ -21,16 +21,16 @@ datasets = {
 %'usps', ...
 %'protein', ...
 %'Sensorless', ...
-'aloi'
+%'aloi'
 };
 
 model.n_folds = 5;
 model.n_repeats = 3;
 model.rate_test = 0.3;
-model.rate_labeled = 0.3;
-model.n_batch = 1;
+model.rate_labeled = 0.1;
+model.n_batch = 100;
 model.T = 10;
-model.can_tau_I = [10.^(-9:-7), 0];
-model.can_tau_A = 10.^-(7:2:11);
+model.can_tau_I = [10.^-(3:2:7), 0];
+model.can_tau_A = 0; %10.^-(7:2:11);
 model.can_tau_S = [10.^-(3:2:7), 0];
-model.can_step = %10.^(3:4);
+model.can_step = 1e-3;%10.^(3:4);

@@ -6,7 +6,7 @@ addpath('./core_functions/');
 clear;
 rng('default');
 
-dataset = 'aloi';
+dataset = 'pendigits';
 [X, y] = load_data(char(dataset));
 tic;
 L = construct_laplacian_graph(char(dataset), X, 10);
@@ -23,16 +23,17 @@ y_test = y(:, test_idx);
 XLX = X(:, train_idx)*L(train_idx, train_idx)*X(:, train_idx)';
 
 model.data_name = char(dataset);
-model.tau_I = 1e-4;%1e-5;
+model.tau_I = 0;%1e-09;
 model.tau_A = 0;%1e-5;
-model.tau_S = 1e-5;
-model.step = 1e-3;
+model.tau_S = 0;%1e-5;
+model.varepsilon = 1e-2;
 model.xi = 0.5;
 model.n_batch = 32;
 model.T = 50;
-model.n_record_batch = 1;
+% record 30 times
+model.n_record_batch = 1 : floor(numel(y_train) / model.n_batch * model.T /50) : ceil(numel(y_train) / model.n_batch) * model.T;
 model.test_batch = true;
 model.X_test = X_test;
 model.y_test = y_test;
-model = ps3vt_multi_train(XLX, X(:,train_idx(1:100)), y(:, train_idx(1:100)), model);
+model = ps3vt_multi_train(XLX, X_train, y_train, model);
 model
