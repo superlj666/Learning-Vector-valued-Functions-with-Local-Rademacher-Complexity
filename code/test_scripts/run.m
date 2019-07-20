@@ -6,13 +6,12 @@ addpath('./core_functions/');
 clear;
 rng('default');
 
-dataset = 'Sensorless';
+dataset = 'SVHN';
 model.use_gpu = true;
 
 [X, y] = load_data(char(dataset));
-if(model.use_gpu)
-    X = full(gpuArray(X));
-end
+X = random_fourier_features(X, 100, 16);
+X = gpuArray(X);
 tic;
 L = construct_laplacian_graph(char(dataset), X, 10);
 toc

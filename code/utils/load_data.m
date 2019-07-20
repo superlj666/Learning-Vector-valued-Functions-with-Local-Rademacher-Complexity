@@ -1,6 +1,9 @@
 function [X, y] = load_data(data_name)
-    [y, X] = libsvmread(['../../../../../datasets/', data_name]);
-
+    %[y, X] = libsvmread(['../../../../../datasets/', data_name]);
+    [y, X] = libsvmread(['/home/lijian/datasets/', data_name]);
+    max_columns = max(X);
+    min_columns = min(X);
+    X = (X - min_columns)./(max_columns - min_columns);
     % regularize labels to 1..C 
     if(size(y, 2)==1) 
         y_labels = unique(y);
