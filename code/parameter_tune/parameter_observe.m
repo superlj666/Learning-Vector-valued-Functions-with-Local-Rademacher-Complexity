@@ -3,13 +3,11 @@ function parameter_observe(data_name)
 
     model_lrc_ssl = learner_lrc_ssl(errors_validate, can_tau_S, can_tau_A, can_tau_I);
     model_ssl = learner_ssl(errors_validate, can_tau_S, can_tau_A, can_tau_I);
-    model_ssl.tau_A = 10*model_lrc_ssl.tau_A;
-    model_ssl.tau_S = model_lrc_ssl.tau_S;
+    %model_ssl.tau_A = model_lrc_ssl.tau_A;
     model_lrc = learner_lrc(errors_validate, can_tau_S, can_tau_A, can_tau_I);
-    model_lrc.tau_A = 4*model_lrc_ssl.tau_A;
-    model_lrc.tau_I = 10*model_lrc_ssl.tau_I;
+    %model_lrc.tau_A = model_lrc_ssl.tau_A;
     model_linear = learner_linear(errors_validate, can_tau_S, can_tau_A, can_tau_I);
-    model_linear.tau_A = 10*model_lrc_ssl.tau_A;
+    %model_linear.tau_A = model_lrc_ssl.tau_A;
 
     save(['../result/', data_name, '_models.mat'], 'model_lrc_ssl', 'model_ssl', 'model_lrc', 'model_linear');
 end

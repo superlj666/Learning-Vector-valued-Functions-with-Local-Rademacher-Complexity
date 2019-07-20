@@ -7,7 +7,7 @@ for dataset = datasets
     % load datasets
     [X, y] = load_data(char(dataset));    
     L = construct_laplacian_graph(char(dataset), X, 10);
-
+  
     % cross validation to choose parameters
     if(model.use_gpu)%%
         X = full(gpuArray(X));
