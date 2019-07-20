@@ -1,24 +1,10 @@
 function sigma = select_gaussian_kernel(data_name)
-    sigma = 1;
-    if strcmp(data_name, 'dna')
-        sigma = 6;
-    elseif strcmp(data_name, 'wine')
-        sigma = 1.5;
-    elseif strcmp(data_name, 'usps')
-        sigma = 7;
-    elseif strcmp(data_name, 'protein')
-        sigma = 3.5;
-    elseif strcmp(data_name, 'poker')
-        sigma = 8;
-    elseif strcmp(data_name, 'connect-4')
-        sigma = 8;
-    elseif strcmp(data_name, 'covtype')
-        sigma = 2;
-    elseif strcmp(data_name, 'mnist')
-        sigma = 11;
-    elseif strcmp(data_name, 'cifar10')
-        sigma = 20;
-    elseif strcmp(data_name, 'SVHN')
-        sigma = 15;
+    load('../result/sigma_gaussian_kernel');
+    sigma = 0.5;
+    if(M.isKey(data_name) == false)
+        fprintf(['%s has not been tuned for optimal kernel parameter and use the default 0.5.\n'...
+            'Please run tune_gaussian_kerne.m firstly.'], data_name);
+    else
+        sigma = M(data_name);
     end
 end

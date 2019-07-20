@@ -10,12 +10,17 @@ end
 %% Choose gaussian kernel parameters for our method
 function choose_gaussian_kernel(data_name, model)
     load(['../result/', data_name, '_models.mat'], 'model_lrc_ssl');
-
+    if exist('../result/sigma_gaussian_kernel.mat', 'file') ~= 2
+        M = containers.Map();
+        save('../result/sigma_gaussian_kernel','M');
+    end
+    load('../result/sigma_gaussian_kernel');
+    
     % load datasets
     [X, y] = load_data(data_name);
     L = construct_laplacian_graph(data_name, X, 10);
-    best_sigma = 1;
-    best_error = 1;
+    min_sigma = 1;
+    min_error = 1;
     for sigma = [2.^(-3:1),3:20,25,30]
         %sigma = select_gaussian_kernel(data_name, model_lrc_ssl)
         X_rf_100 = random_fourier_features(X, 100, sigma);
@@ -48,11 +53,14 @@ function choose_gaussian_kernel(data_name, model)
 
             test_errs(1, i_repeat) = min(model_lrc_ssl_rf_100.test_err);
         end
-        if mean(test_errs(1, :)) < best_error
-            best_error = mean(test_errs(1, :));
-            best_sigma = sigma;
+        if mean(test_errs(1, :)) < min_error
+            min_error = mean(test_errs(1, :));
+            min_sigma = sigma;
         end
     end
         fprintf('Dateset: %s\t Method: model_lrc_ssl_rf_100\t Error: %.4f\t Sigma: %.4f\t tau_I: %s\t tau_A: %s\t tau_S: %s\n', ...
-            model.data_name, best_error, best_sigma, num2str(model_lrc_ssl_rf_100.tau_I), num2str(model_lrc_ssl_rf_100.tau_A), num2str(model_lrc_ssl_rf_100.tau_S));
+            model.data_name, min_error, min_sigma, num2str(model_lrc_ssl_rf_100.tau_I), num2str(model_lrc_ssl_rf_100.tau_A), num2str(model_lrc_ssl_rf_100.tau_S));
+
+    M(data_name) = min_sigma;
+    save('../result/sigma_gaussian_kernel','M');
 end
