@@ -1,6 +1,9 @@
 function [X, y] = load_data(data_name)
-    dataset_path = '../../../../../datasets/';
-    %dataset_path = '/home/lijian/datasets/';
+    if strcmp(computer('arch'), 'win64')
+        dataset_path = '../../../../../datasets/';
+    else
+        dataset_path = '/home/lijian/datasets/';
+    end
     if strcmp(check_task_type(data_name), 'ml')
         load([dataset_path, data_name]);
     elseif strcmp(check_task_type(data_name), 'mc')
