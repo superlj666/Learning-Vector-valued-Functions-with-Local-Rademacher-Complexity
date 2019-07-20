@@ -1,4 +1,4 @@
-function model = ps3vt_multi_train(XLX, X_train, y_train, model)
+function model = lsvv_multi_train(XLX, X_train, y_train, model)
 %   Gradient Descent Train for Multi Class Learning
 %
 %   Inputs :

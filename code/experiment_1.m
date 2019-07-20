@@ -1,5 +1,6 @@
- initialization;
+initialization;
 model.T = 30;
+model.n_repeats = 10;
 
 for dataset = datasets
     model.data_name = char(dataset);
@@ -49,18 +50,18 @@ for i_repeat = 1 : model.n_repeats
     model_lrc = model_combination(i_model, model_lrc);
     model_linear = model_combination(i_model, model_linear);
     
-    model_lrc_ssl = ps3vt_multi_train(XLX, X_train, y_train, model_lrc_ssl);
-    model_ssl = ps3vt_multi_train(XLX, X_train, y_train, model_ssl);
-    model_lrc = ps3vt_multi_train(XLX, X_train, y_train, model_lrc);
-    model_linear = ps3vt_multi_train(XLX, X_train, y_train, model_linear);
+    model_lrc_ssl = lsvv_multi_train(XLX, X_train, y_train, model_lrc_ssl);
+    model_ssl = lsvv_multi_train(XLX, X_train, y_train, model_ssl);
+    model_lrc = lsvv_multi_train(XLX, X_train, y_train, model_lrc);
+    model_linear = lsvv_multi_train(XLX, X_train, y_train, model_linear);
     
     model_lrc_ssl_rf_100.X_test = X_rf_100(:, idx_test);
     XLX = X_rf_100(:, idx_train) * L(idx_train, idx_train) * X_rf_100(:, idx_train)';
-    model_lrc_ssl_rf_100 = ps3vt_multi_train(XLX, X_rf_100(:, idx_labeled), y_train, model_lrc_ssl_rf_100);
+    model_lrc_ssl_rf_100 = lsvv_multi_train(XLX, X_rf_100(:, idx_labeled), y_train, model_lrc_ssl_rf_100);
     
     model_lrc_ssl_rf_500.X_test = X_rf_500(:, idx_test);
     XLX = X_rf_500(:, idx_train) * L(idx_train, idx_train) * X_rf_500(:, idx_train)';
-    model_lrc_ssl_rf_500 = ps3vt_multi_train(XLX, X_rf_500(:, idx_labeled), y_train, model_lrc_ssl_rf_500);
+    model_lrc_ssl_rf_500 = lsvv_multi_train(XLX, X_rf_500(:, idx_labeled), y_train, model_lrc_ssl_rf_500);
     
     test_all_errs{1, i_repeat} = model_lrc_ssl.test_err;
     test_all_errs{2, i_repeat} = model_ssl.test_err;

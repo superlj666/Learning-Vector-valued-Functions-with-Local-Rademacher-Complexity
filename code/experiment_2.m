@@ -24,7 +24,7 @@ function error_curve_save(file_path, linear_errs, lrc_errs, ssl_errs, lrc_ssl_er
     plot(1:x_length, lrc_ssl_errs, '-','LineWidth',3.5);
 
     grid on
-    legend({ 'Linear-MC','LRC-MC', 'SS-MC', 'PS3VT'}, 'FontSize',40);
+    legend({ 'Linear-MC','LRC-MC', 'SS-MC', 'LSVV'}, 'FontSize',40);
     ylabel('Error Rate(%)');
     xlabel('The number of iterations');
     set(gca,'FontSize',45,'Fontname', 'Times New Roman');

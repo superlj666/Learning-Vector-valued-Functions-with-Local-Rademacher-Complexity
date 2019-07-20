@@ -68,7 +68,7 @@ function draw_sample_curve1(data_name)
     set(gca,'yTick',[5:1:13]);
     set(gca,'XLim',[1 9]);
     set(gca,'xTick',[1:1:9])
-    legend({ 'Linear-MC','LRC-MC', 'SS-MC', 'PS3VT'}, 'FontSize',40);
+    legend({ 'Linear-MC','LRC-MC', 'SS-MC', 'LSVV'}, 'FontSize',40);
     ylabel('Error Rate(%)');
     xlabel('Labeled Samples Rate (%)');
     set(gca,'FontSize',40,'Fontname', 'Times New Roman');
@@ -111,7 +111,7 @@ function draw_sample_curve(data_name)
     grid on
 %     set(gca,'XLim',[0.5 7.5])
 %     set(gca,'YLim',[min_level-0.5*step max_level+1.2*step])
-    legend({'PS3VT', 'SS-MC','LRC-MC', 'Linear-MC'}, 'FontSize',12);
+    legend({'LSVV', 'SS-MC','LRC-MC', 'Linear-MC'}, 'FontSize',12);
     ylabel('Error Rate(%)');
     xlabel('%# Labeled Samples');
     set(gca,'FontSize',20,'Fontname', 'Times New Roman');

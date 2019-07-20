@@ -42,7 +42,7 @@ function choose_gaussian_kernel(data_name, model)
 
             model_lrc_ssl_rf_100.X_test = X_rf_100(:, idx_test);
             XLX = X_rf_100(:, idx_train) * L(idx_train, idx_train) * X_rf_100(:, idx_train)';
-            model_lrc_ssl_rf_100 = ps3vt_multi_train(XLX, X_rf_100(:, idx_labeled), y_train, model_lrc_ssl_rf_100);
+            model_lrc_ssl_rf_100 = lsvv_multi_train(XLX, X_rf_100(:, idx_labeled), y_train, model_lrc_ssl_rf_100);
 
             test_errs(1, i_repeat) = min(model_lrc_ssl_rf_100.test_err);
         end

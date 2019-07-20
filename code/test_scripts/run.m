@@ -6,7 +6,7 @@ addpath('./core_functions/');
 clear;
 rng('default');
 
-dataset = 'SVHN';
+dataset = 'bibtex';
 model.use_gpu = true;
 
 [X, y] = load_data(char(dataset));
@@ -40,5 +40,5 @@ model.n_record_batch = 1 : floor(numel(y_train) / model.n_batch * model.T /50) :
 model.test_batch = true;
 model.X_test = X_test;
 model.y_test = y_test;
-model = ps3vt_multi_train(XLX, X_train, y_train, model);
+model = lsvv_multi_train(XLX, X_train, y_train, model);
 mean(model.test_err(end-5:end))

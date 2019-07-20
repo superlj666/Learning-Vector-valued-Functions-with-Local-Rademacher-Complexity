@@ -1,5 +1,10 @@
 function [X, y] = load_data(data_name)
-    [y, X] = libsvmread(['../../../../../datasets/', data_name]);
+    dataset_path = '../../../../../datasets/';
+    if strcmp(check_task_type(data_name), 'ml')
+        load([dataset_path, data_name]);
+    elseif strcmp(check_task_type(data_name), 'mc')
+        [y, X] = libsvmread([dataset_path, data_name]);
+    end
     %[y, X] = libsvmread(['/home/lijian/datasets/', data_name]);
 
     max_columns = max(X);
@@ -26,7 +31,7 @@ function [X, y] = load_data(data_name)
 %             y_one_hot(y(i), i) = 1;
 %         end
 %         y = y_one_hot;
-        y = y';
     end
+    y = y';
     X = X';
 end

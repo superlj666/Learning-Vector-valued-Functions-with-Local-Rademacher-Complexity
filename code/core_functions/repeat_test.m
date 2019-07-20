@@ -20,7 +20,7 @@ function repeat_errors = repeat_test(model, model_name, X, y, L)
         i_model.test_batch = true;
         i_model.X_test = X(idx_test, :);
         i_model.y_test = y(idx_test);
-        i_model = ps3vt_multi_train(XLX, X(idx_labeled, :), y(idx_labeled), i_model);
+        i_model = lsvv_multi_train(XLX, X(idx_labeled, :), y(idx_labeled), i_model);
 
         test_models{i_repeat, 1} = i_model.test_err;
     end
