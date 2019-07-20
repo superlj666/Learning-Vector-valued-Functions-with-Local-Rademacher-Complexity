@@ -13,8 +13,7 @@ load(['../result/', data_name, '_models.mat'], 'model_linear', 'model_lrc', 'mod
 
 % load datasets
 [X, y] = load_data(data_name);
-for sigma = 2.^(0:5)
-%sigma = select_gaussian_kernel(data_name, model_lrc_ssl)
+sigma = select_gaussian_kernel(data_name);
 X_rf_100 = random_fourier_features(X, 100, sigma);
 X_rf_500 = random_fourier_features(X, 500, sigma);
 L = construct_laplacian_graph(data_name, X, 10);
@@ -97,7 +96,6 @@ fprintf('Dateset: %s\t Method: random features 500\t Mean: %.4f\t STD: %.4f\t ta
 errors_matrix = cell_matrix(test_all_errs);
 save(['../result/', data_name, '_results.mat'], ...
     'errors_matrix');
-end
 end
 
 function output(errs, data_name)

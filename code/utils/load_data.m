@@ -4,7 +4,14 @@ function [X, y] = load_data(data_name)
 
     max_columns = max(X);
     min_columns = min(X);
-    X = (X - min_columns)./(max_columns - min_columns);
+    step = max_columns - min_columns;
+    if find(step == 0)
+        keep_dimensions = setdiff(1:size(X, 2), find(step == 0));
+        X = X(:, keep_dimensions);
+        min_columns = min_columns(keep_dimensions);
+        step = step(keep_dimensions);
+    end
+    X = (X - min_columns)./step;
 
     % regularize labels to 1..C 
     if(size(y, 2)==1) 

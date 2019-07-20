@@ -7,7 +7,10 @@ for dataset = datasets
     % load datasets
     [X, y] = load_data(char(dataset));    
     L = construct_laplacian_graph(char(dataset), X, 10);
-  
+    if (size(X, 1) > 200)
+        X = random_fourier_features(X, 100, 16);
+    end
+    
     % cross validation to choose parameters
     if(model.use_gpu)%%
         X = full(gpuArray(X));
