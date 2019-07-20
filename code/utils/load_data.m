@@ -1,6 +1,6 @@
 function [X, y] = load_data(data_name)
-    [y, X] = libsvmread(['../../../../../datasets/', data_name]);
-
+    %[y, X] = libsvmread(['../../../../../datasets/', data_name]);
+    [y, X] = libsvmread(['/home/lijian/datasets/', data_name]);
     % regularize labels to 1..C 
     if(size(y, 2)==1) 
         y_labels = unique(y);
