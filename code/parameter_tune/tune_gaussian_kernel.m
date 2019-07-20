@@ -13,10 +13,10 @@ load(['../result/', data_name, '_models.mat'], 'model_lrc_ssl');
 
 % load datasets
 [X, y] = load_data(data_name);
-for sigma = 2.^(0:5)
+L = construct_laplacian_graph(data_name, X, 10);
+for sigma = 16:2:32
 %sigma = select_gaussian_kernel(data_name, model_lrc_ssl)
 X_rf_100 = random_fourier_features(X, 100, sigma);
-L = construct_laplacian_graph(data_name, X, 10);
 
 test_errs = zeros(1, model.n_repeats);
 for i_repeat = 1 : model.n_repeats
