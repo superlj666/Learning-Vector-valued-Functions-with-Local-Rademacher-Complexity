@@ -16,11 +16,11 @@ function L = construct_laplacian_graph(data_name, X_train, K)
         disp([num2str(K), '-NN using: ', num2str(time)]);
 
        %% directed graph -------
-        W=sparse(n_sample, n_sample);
+        W=sparse(n_sample, n_sample); 
 
         for col=1:n_sample
             W(col, knn(col, :))= true;
-        end
+         end
         W = W&W';
         
         D = spdiags(sum(W)', 0, n_sample, n_sample);

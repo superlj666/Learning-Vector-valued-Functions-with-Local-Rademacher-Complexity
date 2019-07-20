@@ -6,7 +6,7 @@ addpath('./core_functions/');
 clear;
 rng('default');
 
-dataset = 'covtype';
+dataset = 'Sensorless';
 model.use_gpu = true;
 
 [X, y] = load_data(char(dataset));

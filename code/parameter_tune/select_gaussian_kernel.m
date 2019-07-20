@@ -10,33 +10,32 @@ if(M.isKey(data_name) == false)
     % load datasets
     min_err = 1;
     for i_sigma = 2.^(-10:5)
-        for i_fold = 1 : 5
-            idx_rand = randperm(numel(y));
-            idx_train = idx_rand(min(ceil(numel(y)*0.7), 1000) + 1 : min(numel(y), 3500));
-            
-            model_lrc_ssl_rf_100.n_record_batch = 1:30*32;
-            model_lrc_ssl_rf_100.test_batch = true;
-            
-            test_err = 0;
-            X = random_fourier_features(X, 100, i_sigma);
-            X_train = X(:, idx_train);
-            y_train = y(idx_train);
-            X_test = X(:, idx_train);
-            y_test = y(idx_train);
-            model_lrc_ssl_rf_100.X_test = X_test;
-            model_lrc_ssl_rf_100.y_test = y_test;
-            XLX = X_train * L(idx_train, idx_train) * X_train';
-            
-            model_lrc_ssl_rf_100 = ps3vt_multi_train(XLX, X_train, y_train, model_lrc_ssl_rf_100);
-            
-            test_err = test_err + mean(model_lrc_ssl_rf_100.test_err(1, end - min(5, length(model_lrc_ssl_rf_100.test_err) - 1): end));
-        end
+        idx_rand = randperm(numel(y));
+        idx_test = idx_rand(1:ceil(0.3 * numel(y)));
+        idx_train = setdiff(idx_rand, idx_test);
+        idx_train = idx_train(randperm(numel(idx_train)));
+        idx_labeled = idx_train(sampling_with_labels(y(idx_train), 0.3));
         
-        test_err = test_err / 5;
-        if test_err < min_err
-            min_err = test_err;
-            min_sigma = i_sigma;
-        end
+        X = random_fourier_features(X, 100, i_sigma);
+        X_train = X(:, idx_labeled);
+        y_train = y(idx_labeled);
+        X_test = X(:, idx_test);
+        y_test = y(idx_test);
+        model_lrc_ssl_rf_100.n_record_batch = 1:30*32;
+        model_lrc_ssl_rf_100.test_batch = true;
+        
+        model_lrc_ssl_rf_100.X_test = X_test;
+        model_lrc_ssl_rf_100.y_test = y_test;
+        XLX = X(:, idx_train) * L(idx_train, idx_train) * X(:, idx_train)';
+        
+        model_lrc_ssl_rf_100 = ps3vt_multi_train(XLX, X_train, y_train, model_lrc_ssl_rf_100);
+        
+        test_err = mean(model_lrc_ssl_rf_100.test_err(1, end - min(5, length(model_lrc_ssl_rf_100.test_err) - 1): end));
+    end
+    
+    if test_err < min_err
+        min_err = test_err;
+        min_sigma = i_sigma;
     end
     M(data_name) = min_sigma;
     save('../result/sigma_gaussian_kernel','M');
