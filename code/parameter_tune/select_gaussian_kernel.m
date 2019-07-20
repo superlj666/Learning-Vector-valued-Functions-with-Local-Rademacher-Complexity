@@ -14,5 +14,11 @@ function sigma = select_gaussian_kernel(data_name)
         sigma = 8;
     elseif strcmp(data_name, 'covtype')
         sigma = 2;
+    elseif strcmp(data_name, 'mnist')
+        sigma = 11;
+    elseif strcmp(data_name, 'cifar10')
+        sigma = 20;
+    elseif strcmp(data_name, 'SVHN')
+        sigma = 15;
     end
 end
