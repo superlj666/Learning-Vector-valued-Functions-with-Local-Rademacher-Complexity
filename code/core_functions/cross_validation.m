@@ -50,7 +50,7 @@ for para_I = can_tau_I
                 i_model.X_test = X_train(:, folds_validate{i_fold, 1});
                 i_model.y_test = y_train(:, folds_validate{i_fold, 1});
                 i_model = ps3vt_multi_train(XLX, X_train(:, folds_train_labeled{i_fold, 1}), y_train(:, folds_train_labeled{i_fold, 1}), i_model);
-                test_errs(i_fold) = mean(i_model.test_err);
+                test_errs(i_fold) = min(i_model.test_err);
                 
                 % i_model = model;
                 % i_model = ps3vt_multi_train(XLX, X_train(folds_train_labeled{i_fold, 1}, :), ...
