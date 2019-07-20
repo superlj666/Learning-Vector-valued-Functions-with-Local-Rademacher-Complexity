@@ -17,4 +17,4 @@ for dataset = datasets
         y = gpuArray(y);
     end
     errors_validate = cross_validation(L, X, y, model);
-end
+end  

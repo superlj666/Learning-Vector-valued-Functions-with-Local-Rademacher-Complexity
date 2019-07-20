@@ -109,6 +109,13 @@ function output(errs, data_name)
 
     fid = fopen('../result/exp1/table_result.txt', 'a');
     fprintf(fid, '%s\t', data_name);
+    [y, X] = libsvmread(['../../../../../datasets/', data_name]);
+    fprintf(fid, '%d\t', numel(y));
+    fprintf(fid, '%d\t', size(X, 1));
+    fprintf(fid, '%d\t', max(y));
+    clear X;
+    clear y;
+    
     for i = 1 : size(errs, 2)
         if i == loc_min
             fprintf(fid, '&\\textbf{%2.2f$\\pm$%.2f}\t', mean(errs(:, i)), std(errs(:, i)));
