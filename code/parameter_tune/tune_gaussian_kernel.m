@@ -44,7 +44,7 @@ for i_repeat = 1 : model.n_repeats
     XLX = X_rf_100(:, idx_train) * L(idx_train, idx_train) * X_rf_100(:, idx_train)';
     model_lrc_ssl_rf_100 = ps3vt_multi_train(XLX, X_rf_100(:, idx_labeled), y_train, model_lrc_ssl_rf_100);
     
-    test_errs(1, i_repeat) = mean(model_lrc_ssl_rf_100.test_err(1, end - min(5, length(model_linear.test_err) - 1): end));
+    test_errs(1, i_repeat) = mean(model_lrc_ssl_rf_100.test_err(1, end - min(5, length(model_lrc_ssl_rf_100.test_err) - 1): end));
 end
 
 fprintf('Dateset: %s\t Method: model_lrc_ssl_rf_100\t Mean: %.4f\t STD: %.4f\t tau_I: %s\t tau_A: %s\t tau_S: %s\n', ...
