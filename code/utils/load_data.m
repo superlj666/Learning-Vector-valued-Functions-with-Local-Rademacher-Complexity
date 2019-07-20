@@ -1,11 +1,11 @@
 function [X, y] = load_data(data_name)
-    dataset_path = '../../../../../datasets/';
+    %dataset_path = '../../../../../datasets/';
+    dataset_path = '/home/lijian/datasets/';
     if strcmp(check_task_type(data_name), 'ml')
         load([dataset_path, data_name]);
     elseif strcmp(check_task_type(data_name), 'mc')
         [y, X] = libsvmread([dataset_path, data_name]);
     end
-    %[y, X] = libsvmread(['/home/lijian/datasets/', data_name]);
 
     max_columns = max(X);
     min_columns = min(X);

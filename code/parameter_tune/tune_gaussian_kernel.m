@@ -16,7 +16,7 @@ function choose_gaussian_kernel(data_name, model)
     L = construct_laplacian_graph(data_name, X, 10);
     best_sigma = 1;
     best_error = 1;
-    for sigma = 2.^(-1:5)
+    for sigma = [2.^(-3:1),3:20,25,30]
         %sigma = select_gaussian_kernel(data_name, model_lrc_ssl)
         X_rf_100 = random_fourier_features(X, 100, sigma);
 
