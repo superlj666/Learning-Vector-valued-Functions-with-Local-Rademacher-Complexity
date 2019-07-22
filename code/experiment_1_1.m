@@ -126,14 +126,12 @@ end
 function output(errs, data_name)
     errs = errs' .* 100;
 
-    [~, loc_min] = min(mean(errs));
-    d = errs - errs(:, loc_min);
+
+    errs_linear = errs(:, 1:4);
+    [~, loc_min] = min(mean(errs_linear));
+    d = errs_linear - errs_linear(:, loc_min);
     t = mean(d)./(std(d)/size(d,1));
     t(isnan(t)) = Inf;
-    % if bigger than 1.676, it is significantly better one.
-    
-    errs_linear = errs(:, 1:4);
-    errs_kernel = errs(:, 5:8);
     
     fid = fopen('../result/exp1/table_result_linear.txt', 'a');
     fprintf(fid, '%s\t', data_name);    
@@ -149,6 +147,12 @@ function output(errs, data_name)
     fprintf(fid, '\\\\\n');
     fclose(fid);
     
+    
+    errs_kernel = errs(:, 5:8);
+    [~, loc_min] = min(mean(errs_kernel));
+    d = errs_kernel - errs_kernel(:, loc_min);
+    t = mean(d)./(std(d)/size(d,1));
+    t(isnan(t)) = Inf;
     fid = fopen('../result/exp1/table_result_kernel.txt', 'a');
     fprintf(fid, '%s\t', data_name);    
     for i = 1 : size(errs_kernel, 2)
