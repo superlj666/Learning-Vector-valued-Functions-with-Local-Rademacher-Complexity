@@ -20,6 +20,7 @@ L = construct_laplacian_graph(data_name, X, 10);
 
 test_all_errs = cell(8, model.n_repeats);
 test_errs = zeros(8, model.n_repeats);
+run_times = zeros(8, model.n_repeats);
 for i_repeat = 1 : model.n_repeats
     idx_rand = randperm(numel(y));
     % makse of Laplacian matrix
@@ -42,19 +43,31 @@ for i_repeat = 1 : model.n_repeats
     i_model.X_test = X_test;
     i_model.y_test = y_test;
     
+    t = tic();
     model_lrc_ssl = model_combination(i_model, model_lrc_ssl);
     model_lrc_ssl.T = 30;
     model_lrc_ssl = lsvv_multi_train(XLX, X_train, y_train, model_lrc_ssl);
+    run_time = toc(t);
+    run_times(1, i_repeat) = run_time;
 
+    t = tic();
     model_ssl = model_combination(i_model, model_ssl);
     model_ssl = lsvv_multi_train(XLX, X_train, y_train, model_ssl);
-    
+    run_time = toc(t);
+    run_times(2, i_repeat) = run_time;
+
+    t = tic();
     model_lrc = model_combination(i_model, model_lrc);
     model_lrc = lsvv_multi_train(XLX, X_train, y_train, model_lrc);
-    
+    run_time = toc(t);
+    run_times(3, i_repeat) = run_time;
+
+    t = tic();
     model_linear = model_combination(i_model, model_linear);    
     model_linear = lsvv_multi_train(XLX, X_train, y_train, model_linear);
-    
+    run_time = toc(t);
+    run_times(4, i_repeat) = run_time;
+
     test_all_errs{1, i_repeat} = model_lrc_ssl.test_err;
     test_all_errs{2, i_repeat} = model_ssl.test_err;
     test_all_errs{3, i_repeat} = model_lrc.test_err;
@@ -74,19 +87,31 @@ for i_repeat = 1 : model.n_repeats
     XLX_100 = X_rf_100(:, idx_train) * L(idx_train, idx_train) * X_rf_100(:, idx_train)';
     i_model.X_test = X_test_100;
     
+    t = tic;
     model_lrc_ssl_rf_100 = model_combination(i_model, model_lrc_ssl);
     model_lrc_ssl_rf_100.T = 30;
     model_lrc_ssl_rf_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_ssl_rf_100);
-    
+    run_time = toc(t);
+    run_times(5, i_repeat) = run_time;
+
+    t = tic();
     model_ssl_100 = model_combination(i_model, model_lrc_ssl);
     model_ssl_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_ssl_100);
-    
+    run_time = toc(t);
+    run_times(6, i_repeat) = run_time;
+
+    t = tic();    
     model_lrc_100 = model_combination(i_model, model_lrc_ssl);
     model_lrc_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_100);
-    
+    run_time = toc(t);
+    run_times(7, i_repeat) = run_time;
+
+    t = tic();
     model_linear_100 = model_combination(i_model, model_lrc_ssl);
     model_linear_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_linear_100);
-    
+    run_time = toc(t);
+    run_times(8, i_repeat) = run_time;
+
     test_all_errs{5, i_repeat} = model_lrc_ssl_rf_100.test_err;
     test_all_errs{6, i_repeat} = model_ssl_100.test_err;
     test_all_errs{7, i_repeat} = model_lrc_100.test_err;
@@ -120,12 +145,11 @@ fprintf('Dateset: %s\t Method: model_linear_100\t Mean: %.4f\t STD: %.4f\t tau_I
 
 errors_matrix = cell_matrix(test_all_errs);
 save(['../result/', data_name, '_results.mat'], ...
-    'errors_matrix');
+    'errors_matrix', 'run_times');
 end
 
 function output(errs, data_name)
     errs = errs' .* 100;
-
 
     errs_linear = errs(:, 1:4);
     [~, loc_min] = min(mean(errs_linear));
