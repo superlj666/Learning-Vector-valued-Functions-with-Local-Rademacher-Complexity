@@ -110,11 +110,13 @@ function output(errs, data_name)
 
     fid = fopen('../result/exp1/table_result.txt', 'a');
     fprintf(fid, '%s\t', data_name);
-    [y, X] = libsvmread(['../../../../../datasets/', data_name]);
-    fprintf(fid, '&%d\t', ceil(numel(y)*0.1*0.7));
-    fprintf(fid, '&%d\t', ceil(numel(y)*0.9*0.7));
-    fprintf(fid, '&%d\t', size(X, 2));
-    fprintf(fid, '&%d\t', max(y));
+    [X, y] = load_data(data_name);
+    if strcmp(check_task_type(data_name), 'mc')
+        fprintf(fid, '&%d\t', ceil(numel(y)*0.1*0.7));
+        fprintf(fid, '&%d\t', ceil(numel(y)*0.9*0.7));
+        fprintf(fid, '&%d\t', size(X, 1));
+        fprintf(fid, '&%d\t', max(y));
+    end
     clear X;
     clear y;
     

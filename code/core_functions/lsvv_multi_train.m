@@ -93,11 +93,15 @@ for epoch = 1 : model.T
         % update gradient for every batch
         grad_g = grad_g ./ model.n_batch + 2 * model.tau_A  * W + 2 * model.tau_I * XLX * W;
         
+        % Adadelta
         G = model.xi*G + (1-model.xi)*norm(grad_g, 2)^2;
         i_step = sqrt(W_x + model.varepsilon)/sqrt(G + model.varepsilon);
         W = W - i_step* grad_g;
         W_x = model.xi*W_x + (1-model.xi)*norm(i_step* grad_g, 2)^2;
         
+        % SGD
+        %W = W - model.step*grad_g;
+
         % SVT with proximal gradient
         S = zeros(n_dimension, n_class);
         if model.tau_S ~= 0

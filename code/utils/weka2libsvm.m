@@ -1,8 +1,13 @@
 javaaddpath('D:\Program Files\Weka-3-8\weka.jar');
-wekaObj = loadARFF('C:\Users\superlj666\Downloads\Compressed\scene\scene.arff');
+wekaObj = loadARFF('C:\Users\superlj666\Downloads\Compressed\mtr-datasets\mtr-datasets\rf2.arff');
 [mdata,featureNames,targetNDX,stringVals,relationName] =  weka2matlab(wekaObj);
 
-X = mdata(:, 1:294);
-y = mdata(:, 295:end);
+if sum(sum(ismissing(mdata)))>0
+    fprintf('%s exists missing data\n', char(dataset));
+    mdata= rmmissing(mdata);
+end
 
-save('E:\Datasets\scene.mat', 'X', 'y');
+X = mdata(:, 1:576);
+y = mdata(:, 577:end);
+
+save('E:\Datasets\rf2.mat', 'X', 'y');
