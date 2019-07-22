@@ -73,10 +73,10 @@ for i_repeat = 1 : model.n_repeats
     test_all_errs{3, i_repeat} = model_lrc.test_err;
     test_all_errs{4, i_repeat} = model_linear.test_err;
     
-    test_errs(1, i_repeat) = mean(model_lrc_ssl.test_err(1, end - min(5, length(model_lrc_ssl.test_err) - 1): end));
-    test_errs(2, i_repeat) = mean(model_ssl.test_err(1, end - min(5, length(model_ssl.test_err) - 1): end));
-    test_errs(3, i_repeat) = mean(model_lrc.test_err(1, end - min(5, length(model_lrc.test_err) - 1): end));
-    test_errs(4, i_repeat) = mean(model_linear.test_err(1, end - min(5, length(model_linear.test_err) - 1): end));
+    test_errs(1, i_repeat) = min(model_lrc_ssl.test_err(1, end - min(5, length(model_lrc_ssl.test_err) - 1): end));
+    test_errs(2, i_repeat) = min(model_ssl.test_err(1, end - min(5, length(model_ssl.test_err) - 1): end));
+    test_errs(3, i_repeat) = min(model_lrc.test_err(1, end - min(5, length(model_lrc.test_err) - 1): end));
+    test_errs(4, i_repeat) = min(model_linear.test_err(1, end - min(5, length(model_linear.test_err) - 1): end));
     
     clear X_train
     clear X_test
@@ -117,10 +117,10 @@ for i_repeat = 1 : model.n_repeats
     test_all_errs{7, i_repeat} = model_lrc_100.test_err;
     test_all_errs{8, i_repeat} = model_linear_100.test_err;
     
-    test_errs(5, i_repeat) = mean(model_lrc_ssl_rf_100.test_err(1, end - min(5, length(model_lrc_ssl_rf_100.test_err) - 1): end));
-    test_errs(6, i_repeat) = mean(model_ssl_100.test_err(1, end - min(5, length(model_ssl_100.test_err) - 1): end));
-    test_errs(7, i_repeat) = mean(model_lrc_100.test_err(1, end - min(5, length(model_lrc_100.test_err) - 1): end));
-    test_errs(8, i_repeat) = mean(model_linear_100.test_err(1, end - min(5, length(model_linear_100.test_err) - 1): end));
+    test_errs(5, i_repeat) = min(model_lrc_ssl_rf_100.test_err(1, end - min(5, length(model_lrc_ssl_rf_100.test_err) - 1): end));
+    test_errs(6, i_repeat) = min(model_ssl_100.test_err(1, end - min(5, length(model_ssl_100.test_err) - 1): end));
+    test_errs(7, i_repeat) = min(model_lrc_100.test_err(1, end - min(5, length(model_lrc_100.test_err) - 1): end));
+    test_errs(8, i_repeat) = min(model_linear_100.test_err(1, end - min(5, length(model_linear_100.test_err) - 1): end));
 end
 
 output(test_errs, data_name);
