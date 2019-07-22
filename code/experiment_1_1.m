@@ -188,6 +188,8 @@ function output(errs, data_name)
             fprintf(fid,'&%2.2f$\\pm$%.2f\t', mean(errs_kernel(:, i)), std(errs_kernel(:, i)));
         end
     end
+    fprintf(fid, '\\\\\n');
+    fclose(fid);
 end
 
 function errors_matrix = cell_matrix(errors_cell)
