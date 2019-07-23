@@ -30,7 +30,11 @@ tic();
 
 n_dimension = size(X_train, 1);
 n_sample = size(X_train, 2);
-n_class = max(y_train);
+if size(y_train, 1) == 1
+    n_class = max(y_train);
+else
+    n_class = size(y_train, 1);
+end
 
 if ~isfield(model, 'tau_A'), model.tau_A = 0; end
 if ~isfield(model, 'tau_I'), model.tau_I = 1e-8; end
@@ -75,19 +79,25 @@ for epoch = 1 : model.T
             
             % find true margin and predict margin
             h_x = W' * X_train(:, i_idx);
-            margin_true = h_x(y_train(i_idx));
-            h_x(y_train(i_idx)) = -Inf;
-            [margin_pre, loc_pre] = max(h_x);
-            
-            % rough estimation of loss and error for every epoch
-            errTot = errTot + (margin_true <= margin_pre);
-            lossTot = lossTot + max(1-margin_true + margin_pre, 0);
-            
-            % calculate gradient for every instance
-            if margin_true-margin_pre < 1
-                grad_g( : , y_train(i_idx)) = grad_g( : , y_train(i_idx)) -X_train(:, i_idx);
-                grad_g( : , loc_pre) = grad_g( : , loc_pre) + X_train(:, i_idx);
-                n_update = n_update + 1;
+            if size(y_train, 1) == 1
+                % multi-class or binary class
+                margin_true = h_x(y_train(i_idx));
+                h_x(y_train(i_idx)) = -Inf;
+                [margin_pre, loc_pre] = max(h_x);
+
+                % rough estimation of loss and error for every epoch
+                errTot = errTot + (margin_true <= margin_pre);
+                lossTot = lossTot + max(1-margin_true + margin_pre, 0);
+
+                % calculate gradient for every instance
+                if margin_true-margin_pre < 1
+                    grad_g( : , y_train(i_idx)) = grad_g( : , y_train(i_idx)) -X_train(:, i_idx);
+                    grad_g( : , loc_pre) = grad_g( : , loc_pre) + X_train(:, i_idx);
+                    n_update = n_update + 1;
+                end
+            else
+                % multi-label learning
+                grad_g = grad_g + 2*X_train(:, i_idx)*(h_x - y_train(:, i_idx))';
             end
         end
         % update gradient for every batch

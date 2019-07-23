@@ -44,19 +44,16 @@ for para_I = can_tau_I
                 
                 % training
                 i_model = model;
-                i_model.n_record_batch = ceil(numel(folds_train_labeled{i_fold, 1}) / i_model.n_batch * 0.5) : 100 ...
-                    : ceil(numel(folds_train_labeled{i_fold, 1}) / i_model.n_batch) * model.T;
+                %i_model.n_record_batch = ceil(numel(folds_train_labeled{i_fold, 1}) / i_model.n_batch * 0.5) : 100 ...
+                  %  : ceil(numel(folds_train_labeled{i_fold, 1}) / i_model.n_batch) * model.T;
+                n_sample = length(folds_train_labeled{i_fold, 1});
+                i_model.n_record_batch = 1 : floor(n_sample / model.n_batch * model.T /30) : ceil(n_sample / model.n_batch) * model.T;
+                
                 i_model.test_batch = true;
                 i_model.X_test = X_train(:, folds_validate{i_fold, 1});
                 i_model.y_test = y_train(:, folds_validate{i_fold, 1});
                 i_model = lsvv_multi_train(XLX, X_train(:, folds_train_labeled{i_fold, 1}), y_train(:, folds_train_labeled{i_fold, 1}), i_model);
                 test_errs(i_fold) = min(i_model.test_err);
-                
-                % i_model = model;
-                % i_model = lsvv_multi_train(XLX, X_train(folds_train_labeled{i_fold, 1}, :), ...
-                % y_train(folds_train_labeled{i_fold, 1}), i_model);
-                % i_model = record_batch(XLX, X_train(folds_validate{i_fold, 1}, :), y_train(folds_validate{i_fold, 1}), i_model, 'test');
-                % test_errs(i_fold) = i_model.test_err(end);
             end
             
             fprintf('Grid: %.0f/%.0f\t ERR: %.4f\t tau_I: %s\t tau_A: %s\t tau_S: %s\n', ...

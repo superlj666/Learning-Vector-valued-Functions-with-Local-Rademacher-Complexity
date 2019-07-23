@@ -19,27 +19,47 @@ end
 out = model.weights' * X;
 loss = 0;
 err = 0;
+task_type = check_task_type(model.data_name);
+n_test = 0;
 
-for i_sample = 1 : numel(y)
-    h_x = out( : ,i_sample);
-    label_true = y(i_sample);
-    margin_true = h_x(label_true);
-    h_x(label_true) = -Inf;
-    [margin_subopt, label_subopt] = max(h_x);
-    loss = loss + max(1 - margin_true + margin_subopt, 0);
-    err = err + (margin_true <=  margin_subopt);
+if strcmp(task_type, 'mc')
+    n_test = numel(y);
+    for i_sample = 1 : n_test
+        h_x = out( : ,i_sample);
+        label_true = y(i_sample);
+        margin_true = h_x(label_true);
+        h_x(label_true) = -Inf;
+        [margin_subopt, label_subopt] = max(h_x);
+        loss = loss + max(1 - margin_true + margin_subopt, 0);
+        err = err + (margin_true <=  margin_subopt);
+    end
+elseif strcmp(task_type, 'mlc')
+    n_test = size(y, 2);
+    for i_sample = 1 : n_test
+        h_x = out( : ,i_sample);
+        loss = loss + norm(h_x - y(:, i_sample), 2)^2;
+        h_x = h_x > 0.5;
+        err = err + sum(xor(h_x, y(:, i_sample)))/size(y, 1);
+    end
+elseif strcmp(task_type, 'mlr')
+    n_test = size(y, 2);
+    for i_sample = 1 : n_test
+        h_x = out( : ,i_sample);
+        loss = loss + norm(h_x - y(:, i_sample), 2)^2;
+        err = err + norm(h_x - y(:, i_sample), 2)/size(y, 1);
+    end
 end
 
 if strcmpi(type, 'test')
-    model.test_err(end + 1) = gather(err/numel(y));
-    model.test_loss(end + 1) = gather(loss/numel(y));
+    model.test_err(end + 1) = gather(err/n_test);
+    model.test_loss(end + 1) = gather(loss/n_test);
     model.test_complexity(end + 1) = gather(model.tau_A * norm(model.weights, 'fro')^2);
     model.test_unlabeled(end + 1) = gather(model.tau_I * trace(model.weights' * XLX * model.weights));
     model.test_trace(end + 1) =  gather(model.tau_S * sum(sqrt(eig(model.S' * model.S))));
     model.test_objective(end + 1) = gather(model.test_loss(end) + model.test_complexity(end) + model.test_unlabeled(end) + model.test_trace(end));
 elseif strcmpi(type, 'train')
-    model.train_err(end + 1) = gather(err/numel(y));
-    model.train_loss(end + 1) = gather(loss/numel(y));
+    model.train_err(end + 1) = gather(err/n_test);
+    model.train_loss(end + 1) = gather(loss/n_test);
     model.train_complexity(end + 1) = gather(model.tau_A * norm(model.weights, 'fro')^2);
     model.train_unlabeled(end + 1) = gather(model.tau_I * trace(model.weights' * XLX * model.weights));
     model.train_trace(end + 1) =  gather(model.tau_S * sum(sqrt(eig(model.S' * model.S))));

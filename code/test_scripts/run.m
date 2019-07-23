@@ -38,8 +38,7 @@ model.varepsilon = 1e-2;
 model.xi = 0.5;
 model.n_batch = 32;
 model.T = 30;
-% record 30 times
-model.n_record_batch = 1 : floor(numel(y_train) / model.n_batch * model.T /30) : ceil(numel(y_train) / model.n_batch) * model.T;
+
 model.test_batch = true;
 model.X_test = X_test;
 model.y_test = y_test;
