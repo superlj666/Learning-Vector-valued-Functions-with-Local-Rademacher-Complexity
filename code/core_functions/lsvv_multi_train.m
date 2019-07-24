@@ -137,7 +137,7 @@ for epoch = 1 : model.T
         % early stop only controled by test error
         if isfield(model, 'test_batch') && model.iter_batch > 0.5 * ceil(n_sample / model.n_batch) ...
                 && isfield(model, 'test_err') && numel(model.test_err) > 5 ...
-                && numel(unique(model.test_err(end - min(5, model.test_err - 1) : end))) == 1
+                && numel(unique(model.test_err(end - 5 : end))) == 1
             if isfield(model, 'n_record_batch')
                 model.time_train = model.time_train + toc();
                 model.weights = W;
@@ -148,6 +148,7 @@ for epoch = 1 : model.T
                 tic();
             end
             converge = true;
+            fprintf("early stop at %d epoch.\n", model.epoch);
             break;
         end
     end
