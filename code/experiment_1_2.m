@@ -16,14 +16,15 @@ load(['../result/', data_name, '_models.mat'], 'model_linear', 'model_lrc', 'mod
 sigma = select_gaussian_kernel(data_name);
 X_rf_100 = random_fourier_features(X, 100, sigma);
 L = construct_laplacian_graph(data_name, X, 10);
+n_sample = size(y, 2);
 
 test_all_errs = cell(8, model.n_repeats);
 test_errs = zeros(8, model.n_repeats);
 run_times = zeros(8, model.n_repeats);
 for i_repeat = 1 : model.n_repeats
-    idx_rand = randperm(numel(y));
+    idx_rand = randperm(n_sample);
     % makse of Laplacian matrix
-    idx_test = idx_rand(1:ceil(model.rate_test * numel(y)));
+    idx_test = idx_rand(1:ceil(model.rate_test * n_sample));
     idx_train = setdiff(idx_rand, idx_test);
     idx_train = idx_train(randperm(numel(idx_train)));
 
