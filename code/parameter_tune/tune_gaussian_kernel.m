@@ -1,5 +1,4 @@
 initialization;
-model.T = 30;
 
 for dataset = datasets
     model.data_name = char(dataset);
@@ -22,7 +21,7 @@ function choose_gaussian_kernel(data_name, model)
     n_samples = size(X, 2);
     min_sigma = 1;
     min_error = 1;
-    for sigma = [2.^(-3:1),3:20,25,30]
+    for sigma = linspace(10,11,10)
         %sigma = select_gaussian_kernel(data_name, model_lrc_ssl)
         X_rf_100 = random_fourier_features(X, 100, sigma);
 
@@ -52,14 +51,14 @@ function choose_gaussian_kernel(data_name, model)
             XLX = X_rf_100(:, idx_train) * L(idx_train, idx_train) * X_rf_100(:, idx_train)';
             model_lrc_ssl_rf_100 = lsvv_multi_train(XLX, X_rf_100(:, idx_labeled), y_train, model_lrc_ssl_rf_100);
 
-            test_errs(1, i_repeat) = min(model_lrc_ssl_rf_100.test_err);
+            test_errs(1, i_repeat) = mean(model_lrc_ssl_rf_100.test_err(max(end-5,end) : end));
         end
         if mean(test_errs(1, :)) < min_error
             min_error = mean(test_errs(1, :));
             min_sigma = sigma;
         end
     end
-        fprintf('Dateset: %s\t Method: model_lrc_ssl_rf_100\t Error: %.4f\t Sigma: %.4f\t tau_I: %s\t tau_A: %s\t tau_S: %s\n', ...
+    fprintf('Dateset: %s\t Method: model_lrc_ssl_rf_100\t Error: %.4f\t Sigma: %.4f\t tau_I: %s\t tau_A: %s\t tau_S: %s\n', ...
             model.data_name, min_error, min_sigma, num2str(model_lrc_ssl_rf_100.tau_I), num2str(model_lrc_ssl_rf_100.tau_A), num2str(model_lrc_ssl_rf_100.tau_S));
 
     M(data_name) = min_sigma;
