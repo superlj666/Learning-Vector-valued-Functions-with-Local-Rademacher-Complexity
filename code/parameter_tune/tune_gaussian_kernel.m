@@ -21,7 +21,7 @@ function choose_gaussian_kernel(data_name, model)
     n_samples = size(X, 2);
     min_sigma = 1;
     min_error = 1;
-    for sigma = linspace(10,11,10)
+    for sigma = [2.^(-3:1),3:20,25,30]
         %sigma = select_gaussian_kernel(data_name, model_lrc_ssl)
         X_rf_100 = random_fourier_features(X, 100, sigma);
 
