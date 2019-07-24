@@ -19,6 +19,7 @@ function choose_gaussian_kernel(data_name, model)
     % load datasets
     [X, y] = load_data(data_name);
     L = construct_laplacian_graph(data_name, X, 10);
+    n_samples = size(X, 2);
     min_sigma = 1;
     min_error = 1;
     for sigma = [2.^(-3:1),3:20,25,30]
@@ -27,16 +28,16 @@ function choose_gaussian_kernel(data_name, model)
 
         test_errs = zeros(1, model.n_repeats);
         for i_repeat = 1 : model.n_repeats
-            idx_rand = randperm(numel(y));
+            idx_rand = randperm(n_samples);
             % makse of Laplacian matrix
-            idx_test = idx_rand(1:ceil(model.rate_test * numel(y)));
+            idx_test = idx_rand(1:ceil(model.rate_test * n_samples));
             idx_train = setdiff(idx_rand, idx_test);
             idx_train = idx_train(randperm(numel(idx_train)));
-            idx_labeled = idx_train(sampling_with_labels(y(idx_train), model.rate_labeled));  
+            idx_labeled = idx_train(sampling_with_labels(y(:, idx_train), model.rate_labeled));  
 
-            y_train = y(idx_labeled);
+            y_train = y(:, idx_labeled);
             X_test = X(:, idx_test);
-            y_test = y(idx_test);
+            y_test = y(:, idx_test);
 
             i_model = model;
             %i_model.n_record_batch = 1 : floor(numel(idx_labeled) / i_model.n_batch * model.T /30) : ceil(numel(idx_labeled) / i_model.n_batch) * model.T;
