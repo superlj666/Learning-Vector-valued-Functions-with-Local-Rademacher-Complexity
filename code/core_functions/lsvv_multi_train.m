@@ -47,6 +47,8 @@ if ~isfield(model, 'T'), model.T = 30; end
 if ~isfield(model, 'iter_batch'), model.iter_batch = 0; end
 if ~isfield(model, 'epoch'), model.epoch = 0; end
 if ~isfield(model, 'time_train'), model.time_train = 0; end
+if ~isfield(model, 'n_record_batch'), model.n_record_batch = ...
+        ceil(linspace(1, ceil(size(y_train, 2) / model.n_batch) * model.T, 30)); end
 
 if isa(X_train, 'gpuArray')
     W = gpuArray.rand(n_dimension, n_class);
@@ -136,7 +138,7 @@ for epoch = 1 : model.T
         end
         % early stop only controled by test error
         if isfield(model, 'test_batch') && model.iter_batch > 0.5 * ceil(n_sample / model.n_batch) ...
-                && isfield(model, 'test_err') && numel(model.test_err) > 10 ...
+                && isfield(model, 'test_err') && numel(model.test_err) > 20 ...
                 && numel(unique(model.test_err(end - 5 : end))) == 1 ...
                 && numel(unique(model.train_err(end - 5 : end))) == 1
             if isfield(model, 'n_record_batch')
