@@ -7,7 +7,7 @@ if sum(sum(ismissing(mdata)))>0
     mdata= rmmissing(mdata);
 end
 
-X = mdata(:, 1:294);
+X = mdata(:, 1:294);    
 y = mdata(:, 295:end);
 
 save('E:\Datasets\bibtex.mat', 'X', 'y');

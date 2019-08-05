@@ -15,7 +15,7 @@ function repeat_errors = repeat_test(model, model_name, X, y, L)
 
         % record training and testing
         i_model = model;
-        i_model.n_record_batch = (ceil(numel(idx_labeled) / i_model.n_batch) * model.T - 99) : ceil(numel(idx_labeled) / i_model.n_batch) * model.T;
+        %i_model.n_record_batch = (ceil(numel(idx_labeled) / i_model.n_batch) * model.T - 99) : ceil(numel(idx_labeled) / i_model.n_batch) * model.T;
         i_model.test_batch = true;
         i_model.X_test = X(:, idx_test);
         i_model.y_test = y(:, idx_test);
