@@ -74,28 +74,6 @@ function model = lsvv_multi_train(XLX, X_train, y_train, model)
             else
                 grad_g = zeros(n_dimension, n_class);
             end
-<<<<<<< HEAD
-        end
-        % update gradient for every batch
-        grad_g = grad_g ./ model.n_batch + 2 * model.tau_A  * W + 2 * model.tau_I * XLX * W;
-        
-        % Adadelta
-        G = model.xi*G + (1-model.xi)*norm(grad_g, 2)^2;
-        i_step = sqrt(W_x + model.varepsilon)/sqrt(G + model.varepsilon);
-        W = W - i_step* grad_g;
-        W_x = model.xi*W_x + (1-model.xi)*norm(i_step* grad_g, 2)^2;
-        
-        % SGD
-        %W = W - model.step*grad_g;
-
-        % SVT with proximal gradient
-        S = zeros(n_dimension, n_class);
-        if model.tau_S ~= 0
-            [U, S, V] = svd(W);
-            model.tail_start = min(model.tail_start, min(n_dimension, n_class));
-            for i_diag = model.tail_start + 1: min(n_dimension, n_class)
-                S(i_diag, i_diag) = max(0, S(i_diag, i_diag)-i_step * model.tau_S);
-=======
             model.iter_batch = model.iter_batch + 1;
 
             for i_sample = (i_batch - 1) * model.n_batch + 1 : min(i_batch * model.n_batch, n_sample)
@@ -123,7 +101,6 @@ function model = lsvv_multi_train(XLX, X_train, y_train, model)
                     % multi-label learning
                     grad_g = grad_g + 2*X_train(:, i_idx)*(h_x - y_train(:, i_idx))';
                 end
->>>>>>> edb2c6899f1c5a3c04669cc15f3538702ffb8018
             end
             % update gradient for every batch
             grad_g = grad_g ./ model.n_batch + 2 * model.tau_A  * W + 2 * model.tau_I * XLX * W;
