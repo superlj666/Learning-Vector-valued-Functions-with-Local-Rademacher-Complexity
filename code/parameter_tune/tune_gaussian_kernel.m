@@ -26,7 +26,7 @@ function choose_gaussian_kernel(data_name, model)
         X_rf_100 = random_fourier_features(X, 100, sigma);
 
         test_errs = zeros(1, model.n_repeats);
-        for i_repeat = 1 : model.n_repeats
+        for i_repeat = 1 : model.n_folds
             idx_rand = randperm(n_samples);
             % makse of Laplacian matrix
             idx_test = idx_rand(1:ceil(model.rate_test * n_samples));

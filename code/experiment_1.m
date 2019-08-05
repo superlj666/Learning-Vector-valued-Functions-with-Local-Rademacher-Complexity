@@ -1,6 +1,4 @@
 initialization;
-model.n_repeats = 10;
-model.T = 10;
 
 for dataset = datasets
     model.data_name = char(dataset);
@@ -45,6 +43,7 @@ function exp1_dataset(model)
         model.data_name, mean(test_errs(8, :)), std(test_errs(8, :)));
 
     errors_matrix = cell_matrix(test_all_errs);
+<<<<<<< HEAD
     save(['../result/exp1/', model.data_name, '_results.mat'], ...
         'errors_matrix', 'run_times');
 end
@@ -145,6 +144,10 @@ function [test_all_errs, run_times] = repeat_train(model, X, X_rf_100, y, L)
         test_all_errs{7, i_repeat} = model_lrc_100.test_err;
         test_all_errs{8, i_repeat} = model_linear_100.test_err;
     end
+=======
+    save(['../result/', model.data_name, '_results.mat'], ...
+        'errors_matrix', 'run_times');
+>>>>>>> edb2c6899f1c5a3c04669cc15f3538702ffb8018
 end
 
 function output(errs, data_name)

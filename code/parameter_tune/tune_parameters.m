@@ -11,10 +11,12 @@ for dataset = datasets
 %     if (size(X, 1) > 200)
 %         X = random_fourier_features(X, 100, 16);
 %     end
+<<<<<<< HEAD
     
+=======
+>>>>>>> edb2c6899f1c5a3c04669cc15f3538702ffb8018
     n_sample = size(y, 2);
-    %model.n_record_batch = 1 : floor(n_sample / model.n_batch * model.T /30) : ceil(n_sample / model.n_batch) * model.T;
-    
+
     % cross validation to choose parameters
     if(model.use_gpu)%%
         X = full(gpuArray(X));
