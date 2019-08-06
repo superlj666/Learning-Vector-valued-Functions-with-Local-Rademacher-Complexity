@@ -39,7 +39,7 @@ function model = lsvv_multi_train(XLX, X_train, y_train, model)
     if ~isfield(model, 'tau_A'), model.tau_A = 0; end
     if ~isfield(model, 'tau_I'), model.tau_I = 1e-8; end
     if ~isfield(model, 'tau_S'), model.tau_S = 1e-6; end
-    if ~isfield(model, 'tail_start'), model.tail_start = ceil(min(n_class, n_dimension) * 0.5); end
+    if ~isfield(model, 'tail_start'), model.theta = ceil(min(n_class, n_dimension) * 0.3); end
     if ~isfield(model, 'xi'), model.xi = 0.5; end
     if ~isfield(model, 'varepsilon'), model.varepsilon = 1e-2; end
     if ~isfield(model, 'n_batch'), model.n_batch = 32; end
@@ -118,8 +118,8 @@ function model = lsvv_multi_train(XLX, X_train, y_train, model)
             S = zeros(n_dimension, n_class);
             if model.tau_S ~= 0
                 [U, S, V] = svd(W);
-                model.tail_start = min(model.tail_start, min(n_dimension, n_class));
-                for i_diag = 1 : model.tail_start
+                model.theta = min(model.theta, min(n_dimension, n_class));
+                for i_diag = 1 : model.theta
                     if S(i_diag, i_diag) > i_step * model.tau_S
                         S(i_diag, i_diag) = S(i_diag, i_diag)-i_step * model.tau_S;
                     end
