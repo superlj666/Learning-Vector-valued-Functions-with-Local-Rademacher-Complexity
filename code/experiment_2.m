@@ -1,6 +1,6 @@
 initialization;
-model.n_repeats = 1;
-model.T = 10;
+model.n_repeats = 10;
+model.T = 30;
 
 for dataset = datasets    
     rng('default');
@@ -23,13 +23,12 @@ function exp2_run(model)
         K = min(size(X, 1), size(y, 1));
     end
     
-    can_theta = 0 : 0.1 : 1;
+    can_theta = 0: 0.1: 1;
     errors_theta = zeros(2, numel(can_theta));
     test_all_errs = cell(2, model.n_repeats, numel(can_theta));
     run_times = zeros(2, model.n_repeats);
     
-    load(['../result/', model.data_name, '_models.mat'], 'model_linear', 'model_lrc', 'model_ssl', 'model_lrc_ssl');
-    model_lrc_ssl.tau_S = 1e-4;
+    load(['../result/', model.data_name, '_models.mat'], 'model_lrc_ssl', 'model_lrc_ssl_100');
     n_sample = size(y, 2);
     idx_rand = randperm(n_sample);
     for i_repeat = 1 : model.n_repeats
@@ -57,13 +56,12 @@ function exp2_run(model)
         
         for i_theta = 1 : numel(can_theta)
             i_theta_partition = can_theta(i_theta);
-            i_model.theta = max(1, floor(K * i_theta_partition));
+            i_model.theta = ceil(K * i_theta_partition);
             
             i_model.X_test = X_test;
             t = tic();
             model_lrc_ssl = model_combination(i_model, model_lrc_ssl);
             model_lrc_ssl.T = 30;
-            %model_lrc_ssl.tau_S = 1e-4;
             model_lrc_ssl = lsvv_multi_train(XLX, X_train, y_train, model_lrc_ssl);
             run_time = toc(t);
             run_times(1, i_repeat) = run_time;            
@@ -71,9 +69,8 @@ function exp2_run(model)
 
             i_model.X_test = X_test_100;
             t = tic;
-            model_lrc_ssl_rf_100 = model_combination(i_model, model_lrc_ssl);
+            model_lrc_ssl_rf_100 = model_combination(i_model, model_lrc_ssl_100);
             model_lrc_ssl_rf_100.T = 30;
-            %model_lrc_ssl_rf_100.tau_S = 1e-1;
             model_lrc_ssl_rf_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_ssl_rf_100);
             run_time = toc(t);
             run_times(2, i_repeat) = run_time;
@@ -103,35 +100,41 @@ function draw_error_curve(data_name)
     
     subplot(121);
     ax = gca;
-    plot(0:1:10, errors_theta(1,:), '-', 'linewidth', 2);   
-    hold on;
-    plot(0:1:10, ones(1,11)*errors_theta(1,11), '-.', 'linewidth', 2);    
-    plot(0:1:10, ones(1,11)*errors_theta(1,1), '--', 'linewidth', 2);  
+    plot(0:1:10, errors_theta(1,:), '-', 'linewidth', 2, 'color', 'r');   
+    hold on;  
+    plot(0:1:10, ones(1,11)*errors_theta(1,1), '--', 'linewidth', 2, 'color', 'g');   
+    plot(0:1:10, ones(1,11)*errors_theta(1,11), '-.', 'linewidth', 2, 'color', 'b');    
     grid on;
-    ylim auto
+    max_level = max(errors_theta(1,:));
+    min_level = min(errors_theta(1,:));
+    step = max_level - min_level;
+    ylim([min_level - 0.5 * step, max_level + 0.5 * step]);
     ax.XTick = 0:2:10;
     ax.XTickLabel = 0:0.2:1;    
     ytickformat('%.2f')
     legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
     ylabel('Error Rate(%)');
     xlabel('\theta / min(K, D)');
-    title(data_name);
+    title([data_name, ' in input space']);
     hold off;
     
     subplot(122);
     ax = gca;
-    plot(0:1:10, errors_theta(2,:), '-', 'linewidth', 2);   
-    hold on;
-    plot(0:1:10, ones(1,11)*errors_theta(2,11), '-.', 'linewidth', 2);    
-    plot(0:1:10, ones(1,11)*errors_theta(2,1), '--', 'linewidth', 2);  
+    plot(0:1:10, errors_theta(2,:), '-', 'linewidth', 2, 'color', 'r');   
+    hold on;  
+    plot(0:1:10, ones(1,11)*errors_theta(2,1), '--', 'linewidth', 2, 'color', 'g');   
+    plot(0:1:10, ones(1,11)*errors_theta(2,11), '-.', 'linewidth', 2, 'color', 'b');   
     grid on;
-    ylim auto
+    max_level = max(errors_theta(2,:));
+    min_level = min(errors_theta(2,:));
+    step = max_level - min_level;
+    ylim([min_level - 0.5 * step, max_level + 0.5 * step]);
     ax.XTick = 0:2:10;
     ax.XTickLabel = 0:0.2:1;    
     ytickformat('%.2f')
     legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
     ylabel('Error Rate(%)');
     xlabel('\theta / min(K, D)');
-    title(data_name);
+    title([data_name, ' with 100 random features']);
     hold off;
 end

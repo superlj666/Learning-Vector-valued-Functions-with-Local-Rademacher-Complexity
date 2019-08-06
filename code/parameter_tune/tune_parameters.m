@@ -11,9 +11,6 @@ for dataset = datasets
     % load datasets
     [X, y] = load_data(char(dataset));    
     L = construct_laplacian_graph(char(dataset), X, 10);
-%     if (size(X, 1) > 200)
-%         X = random_fourier_features(X, 100, 16);
-%     end
     n_sample = size(y, 2);
 
     % cross validation to choose parameters
@@ -21,5 +18,15 @@ for dataset = datasets
         X = full(gpuArray(X));
         y = gpuArray(y);
     end
-    errors_validate = cross_validation(L, X, y, model);
+    errors_validate_linear = cross_validation(L, X, y, model);
+    
+    X = random_fourier_features(X, 100, select_gaussian_kernel(model.data_name));
+    errors_validate_rf = cross_validation(L, X, y, model);
+
+    can_tau_I = model.can_tau_I;
+    can_tau_A = model.can_tau_A;
+    can_tau_S = model.can_tau_S;
+    save(['../data/', model.data_name, '/', 'cross_validation.mat'], ...
+        'errors_validate_linear', 'errors_validate_rf', ...
+        'can_tau_S', 'can_tau_A', 'can_tau_I');
 end

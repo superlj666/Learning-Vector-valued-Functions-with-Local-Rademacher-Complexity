@@ -1,12 +1,13 @@
 initialization;
 model.n_repeats = 3;
-model.T = 10;
+model.T = 20;
 
 for dataset = datasets    
     rng('default');
     model.data_name = char(dataset);
     parameter_observe(model.data_name)
     exp3_run(model);
+    draw_error_curve(char(dataset));
 end
 
 function exp3_run(model)
@@ -17,11 +18,11 @@ function exp3_run(model)
     L = construct_laplacian_graph(model.data_name, X, 10);
     
     can_labeled = 0.1 : 0.1 : 1;
-    errors_labeled = zeros(2, numel(can_labeled));
-    test_all_errs = cell(2, model.n_repeats, numel(can_labeled));
-    run_times = zeros(2, model.n_repeats);
+    errors_labeled = zeros(4, numel(can_labeled));
+    test_all_errs = cell(4, model.n_repeats, numel(can_labeled));
+    run_times = zeros(4, model.n_repeats);
     
-    load(['../result/', model.data_name, '_models.mat'], 'model_linear', 'model_lrc', 'model_ssl', 'model_lrc_ssl');
+    load(['../result/', model.data_name, '_models.mat'], 'model_lrc', 'model_lrc_ssl', 'model_lrc_100', 'model_lrc_ssl_100');
     n_sample = size(y, 2);
     idx_rand = randperm(n_sample);
     for i_labeled = 1 : numel(can_labeled)
@@ -67,22 +68,22 @@ function exp3_run(model)
             
             i_model.X_test = X_test_100;
             t = tic;
-            model_lrc_ssl_rf_100 = model_combination(i_model, model_lrc_ssl);
+            model_lrc_ssl_rf_100 = model_combination(i_model, model_lrc_ssl_100);
             model_lrc_ssl_rf_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_ssl_rf_100);
             run_time = toc(t);
             run_times(3, i_repeat) = run_time;            
             test_all_errs{3, i_repeat, i_labeled} = model_lrc_ssl_rf_100.test_err;
 
             t = tic;
-            model_lrc_100 = model_combination(i_model, model_lrc);
-            model_lrc_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_100);
+            model_lrc_rf_100 = model_combination(i_model, model_lrc_100);
+            model_lrc_rf_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_rf_100);
             run_time = toc(t);
             run_times(4, i_repeat) = run_time;            
-            test_all_errs{4, i_repeat, i_labeled} = model_lrc_100.test_err;
+            test_all_errs{4, i_repeat, i_labeled} = model_lrc_rf_100.test_err;
        end
     end
      
-    for i_method = 1:2
+    for i_method = 1:4
         for i_labeled = 1 : numel(can_labeled)   
             errors_repeat = zeros(1, model.n_repeats);
             for i_repeat = 1:model.n_repeats
@@ -96,27 +97,51 @@ function exp3_run(model)
         'errors_labeled');
 end
 
-function error_curve_save(file_path, linear_errs, lrc_errs, ssl_errs, lrc_ssl_errs)
-    linear_errs = linear_errs(:)*100;
-    lrc_errs = lrc_errs(:)*100;
-    ssl_errs = ssl_errs(:)*100;
-    lrc_ssl_errs = lrc_ssl_errs(:)*100;
-    fig=figure('Position', [100, 100, 850, 600]);
-    x_length = min([size(linear_errs, 1), size(ssl_errs, 1), size(lrc_errs, 1), size(lrc_ssl_errs, 1)]);
-    plot(1:x_length, linear_errs, '-','LineWidth',3.5);
-    hold on;
-    plot(1:x_length, lrc_errs, '-','LineWidth',3.5);
-    plot(1:x_length, ssl_errs, '-','LineWidth',3.5, 'Color', 'black');
-    plot(1:x_length, lrc_ssl_errs, '-','LineWidth',3.5);
-
-    grid on
-    legend({ 'Linear-MC','LRC-MC', 'SS-MC', 'LSVV'}, 'FontSize',40);
+function draw_error_curve(data_name)
+    load(['../result/exp3/', data_name, '_results.mat']);
+    errors_labeled = errors_labeled.*100;
+    figure(1);
+    set(gcf,'Position',[100 100 1000 360]);
+    
+    subplot(121);
+    ax = gca;
+    plot(0:9, errors_labeled(1,:), '-', 'linewidth', 2, 'color', 'r');   
+    hold on;  
+    plot(0:9, errors_labeled(2,:), '--', 'linewidth', 2, 'color', 'b');   
+    grid on;
+    max_level = max(errors_labeled(1,:));
+    min_level = min(errors_labeled(1,:));
+    step = max_level - min_level;
+    ylim([min_level - 0.5 * step, max_level + 0.5 * step]);
+    xlim([0;9]);
+    ax.XTick = 0:9;
+    ax.XTickLabel = 0.1:0.1:1;
+    ytickformat('%.2f')
+    legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
     ylabel('Error Rate(%)');
-    xlabel('The number of iterations');
-    set(gca,'FontSize',45,'Fontname', 'Times New Roman');
+    xlabel('\theta / min(K, D)');
+    title([data_name, ' in input space']);
     hold off;
     
-    print(fig,file_path,'-depsc')
+    subplot(122);
+    ax = gca;
+    plot(0:9, errors_labeled(3,:), '-', 'linewidth', 2, 'color', 'r');   
+    hold on;  
+    plot(0:9, errors_labeled(4,:), '--', 'linewidth', 2, 'color', 'b');   
+    grid on;
+    max_level = max(errors_labeled(3,:));
+    min_level = min(errors_labeled(3,:));
+    step = max_level - min_level;
+    ylim([min_level - 0.5 * step, max_level + 0.5 * step]);
+    xlim([0;9]);
+    ax.XTick = 0:9;
+    ax.XTickLabel = 0.1:0.1:1; 
+    ytickformat('%.2f')
+    legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
+    ylabel('Error Rate(%)');
+    xlabel('\theta / min(K, D)');
+    title([data_name, ' with 100 random features']);
+    hold off;
 end
 
 %experiment_2

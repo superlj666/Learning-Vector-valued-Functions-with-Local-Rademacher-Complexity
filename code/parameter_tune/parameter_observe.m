@@ -1,12 +1,19 @@
 function parameter_observe(data_name)
     load(['../data/', data_name, '/', 'cross_validation.mat']);
 
-    model_lrc_ssl = learner_lrc_ssl(errors_validate, can_tau_S, can_tau_A, can_tau_I);
-    model_ssl = learner_ssl(errors_validate, can_tau_S, can_tau_A, can_tau_I);
-    model_lrc = learner_lrc(errors_validate, can_tau_S, can_tau_A, can_tau_I);
-    model_linear = learner_linear(errors_validate, can_tau_S, can_tau_A, can_tau_I);
+    model_lrc_ssl = learner_lrc_ssl(errors_validate_linear, can_tau_S, can_tau_A, can_tau_I);
+    model_ssl = learner_ssl(errors_validate_linear, can_tau_S, can_tau_A, can_tau_I);
+    model_lrc = learner_lrc(errors_validate_linear, can_tau_S, can_tau_A, can_tau_I);
+    model_linear = learner_linear(errors_validate_linear, can_tau_S, can_tau_A, can_tau_I);
+    
+    model_lrc_ssl_100 = learner_lrc_ssl(errors_validate_rf, can_tau_S, can_tau_A, can_tau_I);
+    model_ssl_100 = learner_ssl(errors_validate_rf, can_tau_S, can_tau_A, can_tau_I);
+    model_lrc_100 = learner_lrc(errors_validate_rf, can_tau_S, can_tau_A, can_tau_I);
+    model_linear_100 = learner_linear(errors_validate_rf, can_tau_S, can_tau_A, can_tau_I);
 
-    save(['../result/', data_name, '_models.mat'], 'model_lrc_ssl', 'model_ssl', 'model_lrc', 'model_linear');
+    save(['../result/', data_name, '_models.mat'], ...
+        'model_lrc_ssl', 'model_ssl', 'model_lrc', 'model_linear', ...
+        'model_lrc_ssl_100', 'model_ssl_100', 'model_lrc_100', 'model_linear_100');
 end
 
 function model = learner_lrc_ssl(errors_validate, can_tau_S, can_tau_A, can_tau_I)

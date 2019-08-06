@@ -67,7 +67,5 @@ end
 [d2, d3, d4] = ind2sub([numel(can_tau_S), numel(can_tau_A), numel(can_tau_I)], loc_best);
 fprintf('-----Best ERR: %.4f\t tau_I: %s\t tau_A: %s\t tau_S: %s\n-----\n', ...
     errors_validate{loc_best, 1}, num2str(can_tau_I(d4)), num2str(can_tau_A(d3)), num2str(can_tau_S(d2)));
-save(['../data/', data_name, '/', 'cross_validation.mat']);
-
 % cv_results = reshape(errors_validate, [numel(can_tau_S), numel(can_tau_A), numel(can_tau_I)]);
 end
