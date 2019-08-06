@@ -1,6 +1,6 @@
 %addpath('../libsvm/matlab/');
 addpath('./parameter_tune/');
-addpath('./utils/*');
+addpath('./utils/');
 addpath('./core_functions/');
 clear;
 rng('default');
@@ -38,11 +38,11 @@ model.n_folds = 5;
 model.n_repeats = 30;
 model.rate_test = 0.3;
 model.rate_labeled = 0.1;
-model.T = 10;
+model.T = 30;
 
 model.can_tau_I = [10.^-(5:2:15), 0];
 model.can_tau_A = 10.^-(3:2:9);
-model.can_tau_S = [10.^-(5:2:15), 0];
+model.can_tau_S = [10.^(-8:2:0), 0];
 
 model.varepsilon = 1;
 model.xi = 0.5;

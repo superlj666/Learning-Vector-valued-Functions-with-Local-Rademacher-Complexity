@@ -6,7 +6,7 @@ for dataset = datasets
     draw_sample_curve1(char(dataset));
 end
 
-function exp3_dataset(data_name, model)
+function exp4_dataset(data_name, model)
     %% Choose parameters for our method
     load(['../result/', data_name, '_models.mat'], 'model_linear', 'model_lrc', 'model_ssl', 'model_lrc_ssl');
     model_linear = model_combination(model, model_linear);
