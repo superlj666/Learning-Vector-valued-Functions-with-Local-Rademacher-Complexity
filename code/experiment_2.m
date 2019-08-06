@@ -1,12 +1,13 @@
 initialization;
-model.n_repeats = 3;
-%model.T = 10;
+model.n_repeats = 1;
+model.T = 10;
 
 for dataset = datasets    
     rng('default');
     model.data_name = char(dataset);
     parameter_observe(model.data_name)
-    exp2_run(model);
+    %exp2_run(model);
+    draw_error_curve(char(dataset));
 end
 
 function exp2_run(model)
@@ -28,6 +29,7 @@ function exp2_run(model)
     run_times = zeros(2, model.n_repeats);
     
     load(['../result/', model.data_name, '_models.mat'], 'model_linear', 'model_lrc', 'model_ssl', 'model_lrc_ssl');
+    model_lrc_ssl.tau_S = 1e-3;
     n_sample = size(y, 2);
     idx_rand = randperm(n_sample);
     for i_repeat = 1 : model.n_repeats
@@ -64,8 +66,7 @@ function exp2_run(model)
             %model_lrc_ssl.tau_S = 1e-4;
             model_lrc_ssl = lsvv_multi_train(XLX, X_train, y_train, model_lrc_ssl);
             run_time = toc(t);
-            run_times(1, i_repeat) = run_time;
-            
+            run_times(1, i_repeat) = run_time;            
             test_all_errs{1, i_repeat, i_theta} = model_lrc_ssl.test_err;
 
             i_model.X_test = X_test_100;
@@ -75,8 +76,7 @@ function exp2_run(model)
             %model_lrc_ssl_rf_100.tau_S = 1e-1;
             model_lrc_ssl_rf_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_ssl_rf_100);
             run_time = toc(t);
-            run_times(5, i_repeat) = run_time;
-
+            run_times(2, i_repeat) = run_time;
             test_all_errs{2, i_repeat, i_theta} = model_lrc_ssl_rf_100.test_err;
         end
     end
@@ -95,28 +95,43 @@ function exp2_run(model)
         'errors_theta');
 end
 
-function draw_error_curve(file_path, linear_errs, lrc_errs, ssl_errs, lrc_ssl_errs)
-    linear_errs = linear_errs(:)*100;
-    lrc_errs = lrc_errs(:)*100;
-    ssl_errs = ssl_errs(:)*100;
-    lrc_ssl_errs = lrc_ssl_errs(:)*100;
-    fig=figure('Position', [100, 100, 850, 600]);
-    x_length = min([size(linear_errs, 1), size(ssl_errs, 1), size(lrc_errs, 1), size(lrc_ssl_errs, 1)]);
-    plot(1:x_length, linear_errs, '-','LineWidth',3.5);
+function draw_error_curve(data_name)
+    load(['../result/exp2/', data_name, '_results.mat']);
+    errors_theta = errors_theta.*100;
+    figure(1);
+    set(gcf,'Position',[100 100 1000 360]);
+    
+    subplot(121);
+    ax = gca;
+    plot(0:1:10, errors_theta(1,:), '-', 'linewidth', 2);   
     hold on;
-    plot(1:x_length, lrc_errs, '-','LineWidth',3.5);
-    plot(1:x_length, ssl_errs, '-','LineWidth',3.5, 'Color', 'black');
-    plot(1:x_length, lrc_ssl_errs, '-','LineWidth',3.5);
-
-    grid on
-    legend({ 'Linear-MC','LRC-MC', 'SS-MC', 'LSVV'}, 'FontSize',40);
+    plot(0:1:10, ones(1,11)*errors_theta(1,11), '-.', 'linewidth', 2);    
+    plot(0:1:10, ones(1,11)*errors_theta(1,1), '--', 'linewidth', 2);  
+    grid on;
+    ylim auto
+    ax.XTick = 0:2:10;
+    ax.XTickLabel = 0:0.2:1;    
+    ytickformat('%.2f')
+    legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
     ylabel('Error Rate(%)');
-    xlabel('The number of iterations');
-    set(gca,'FontSize',45,'Fontname', 'Times New Roman');
+    xlabel('\theta / min(K, D)');
+    title(data_name);
     hold off;
     
-    print(fig,file_path,'-depsc')
+    subplot(122);
+    ax = gca;
+    plot(0:1:10, errors_theta(2,:), '-', 'linewidth', 2);   
+    hold on;
+    plot(0:1:10, ones(1,11)*errors_theta(2,11), '-.', 'linewidth', 2);    
+    plot(0:1:10, ones(1,11)*errors_theta(2,1), '--', 'linewidth', 2);  
+    grid on;
+    ylim auto
+    ax.XTick = 0:2:10;
+    ax.XTickLabel = 0:0.2:1;    
+    ytickformat('%.2f')
+    legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
+    ylabel('Error Rate(%)');
+    xlabel('\theta / min(K, D)');
+    title(data_name);
+    hold off;
 end
-
-%experiment_2
-%error_curve_save(file_path,errors_matrix(4,:,:),errors_matrix(3,:,:), errors_matrix(2,:,:), errors_matrix(1,:,:));

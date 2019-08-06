@@ -1,4 +1,7 @@
 initialization;
+model.n_folds = 3;
+model.T = 20;
+
 for dataset = datasets
     rng('default');
     model.data_name = char(dataset);

@@ -119,8 +119,10 @@ function model = lsvv_multi_train(XLX, X_train, y_train, model)
             if model.tau_S ~= 0
                 [U, S, V] = svd(W);
                 model.tail_start = min(model.tail_start, min(n_dimension, n_class));
-                for i_diag = model.tail_start : min(n_dimension, n_class)
-                    S(i_diag, i_diag) = max(0, S(i_diag, i_diag)-i_step * model.tau_S);
+                for i_diag = 1 : model.tail_start
+                    if S(i_diag, i_diag) > i_step * model.tau_S
+                        S(i_diag, i_diag) = S(i_diag, i_diag)-i_step * model.tau_S;
+                    end
                 end
                 W = (U * S) * V';
             end

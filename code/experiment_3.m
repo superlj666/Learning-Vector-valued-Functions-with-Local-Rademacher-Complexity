@@ -16,12 +16,6 @@ function exp3_run(model)
     X_rf_100 = random_fourier_features(X, 100, sigma);
     L = construct_laplacian_graph(model.data_name, X, 10);
     
-    if strcmp(check_task_type(model.data_name), 'mc')
-        K = min(size(X, 1), max(y));
-    else
-        K = min(size(X, 1), size(y, 1));
-    end
-    
     can_labeled = 0.1 : 0.1 : 1;
     errors_labeled = zeros(2, numel(can_labeled));
     test_all_errs = cell(2, model.n_repeats, numel(can_labeled));
@@ -56,22 +50,35 @@ function exp3_run(model)
             XLX_100 = X_rf_100(:, idx_train) * L(idx_train, idx_train) * X_rf_100(:, idx_train)';
 
             i_model.X_test = X_test;
+
             t = tic();
             model_lrc_ssl = model_combination(i_model, model_lrc_ssl);
             model_lrc_ssl = lsvv_multi_train(XLX, X_train, y_train, model_lrc_ssl);
             run_time = toc(t);
             run_times(1, i_repeat) = run_time;
-            
             test_all_errs{1, i_repeat, i_labeled} = model_lrc_ssl.test_err;
+
+            t = tic();
+            model_lrc = model_combination(i_model, model_lrc);
+            model_lrc = lsvv_multi_train(XLX, X_train, y_train, model_lrc);
+            run_time = toc(t);
+            run_times(2, i_repeat) = run_time;
+            test_all_errs{2, i_repeat, i_labeled} = model_lrc.test_err;
             
             i_model.X_test = X_test_100;
             t = tic;
             model_lrc_ssl_rf_100 = model_combination(i_model, model_lrc_ssl);
             model_lrc_ssl_rf_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_ssl_rf_100);
             run_time = toc(t);
-            run_times(5, i_repeat) = run_time;
-            
-            test_all_errs{2, i_repeat, i_labeled} = model_lrc_ssl_rf_100.test_err;
+            run_times(3, i_repeat) = run_time;            
+            test_all_errs{3, i_repeat, i_labeled} = model_lrc_ssl_rf_100.test_err;
+
+            t = tic;
+            model_lrc_100 = model_combination(i_model, model_lrc);
+            model_lrc_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_100);
+            run_time = toc(t);
+            run_times(4, i_repeat) = run_time;            
+            test_all_errs{4, i_repeat, i_labeled} = model_lrc_100.test_err;
        end
     end
      

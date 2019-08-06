@@ -1,4 +1,5 @@
 initialization;
+model.n_repeats = 10;
 
 for dataset = datasets
     model.data_name = char(dataset);
