@@ -42,7 +42,7 @@ model.T = 30;
 
 model.can_tau_I = [10.^-(5:2:15), 0];
 model.can_tau_A = 10.^-(3:2:9);
-model.can_tau_S = [10.^(-8:2:0), 0];
+model.can_tau_S = [10.^(-4:0), 0];
 
 model.varepsilon = 1;
 model.xi = 0.5;
