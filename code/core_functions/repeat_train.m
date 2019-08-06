@@ -71,19 +71,19 @@ function [test_all_errs, run_times] = repeat_train(model, X, X_rf_100, y, L)
         run_times(5, i_repeat) = run_time;
 
         t = tic();
-        model_ssl_100 = model_combination(i_model, model_lrc_ssl);
+        model_ssl_100 = model_combination(i_model, model_ssl);
         model_ssl_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_ssl_100);
         run_time = toc(t);
         run_times(6, i_repeat) = run_time;
 
         t = tic();
-        model_lrc_100 = model_combination(i_model, model_lrc_ssl);
+        model_lrc_100 = model_combination(i_model, model_lrc);
         model_lrc_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_100);
         run_time = toc(t);
         run_times(7, i_repeat) = run_time;
 
         t = tic();
-        model_linear_100 = model_combination(i_model, model_lrc_ssl);
+        model_linear_100 = model_combination(i_model, model_linear);
         model_linear_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_linear_100);
         run_time = toc(t);
         run_times(8, i_repeat) = run_time;

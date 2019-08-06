@@ -6,7 +6,7 @@ for dataset = datasets
     rng('default');
     model.data_name = char(dataset);
     parameter_observe(model.data_name)
-    %exp2_run(model);
+    exp2_run(model);
     draw_error_curve(char(dataset));
 end
 
@@ -29,7 +29,7 @@ function exp2_run(model)
     run_times = zeros(2, model.n_repeats);
     
     load(['../result/', model.data_name, '_models.mat'], 'model_linear', 'model_lrc', 'model_ssl', 'model_lrc_ssl');
-    model_lrc_ssl.tau_S = 1e-3;
+    model_lrc_ssl.tau_S = 1e-4;
     n_sample = size(y, 2);
     idx_rand = randperm(n_sample);
     for i_repeat = 1 : model.n_repeats
@@ -57,7 +57,7 @@ function exp2_run(model)
         
         for i_theta = 1 : numel(can_theta)
             i_theta_partition = can_theta(i_theta);
-            i_model.tail_start = max(1, floor(K * i_theta_partition));
+            i_model.theta = max(1, floor(K * i_theta_partition));
             
             i_model.X_test = X_test;
             t = tic();
