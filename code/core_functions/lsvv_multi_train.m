@@ -153,7 +153,7 @@ function model = lsvv_multi_train(XLX, X_train, y_train, model)
                     tic();
                 end
                 converge = true;
-                fprintf("early stop at %d epoch.\n", model.epoch);
+                %fprintf("early stop at %d epoch.\n", model.epoch);
                 break;
             end
         end

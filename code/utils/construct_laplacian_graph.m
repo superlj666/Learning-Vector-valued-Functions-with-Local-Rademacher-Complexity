@@ -28,5 +28,5 @@ function L = construct_laplacian_graph(data_name, X_train, K)
         save(str, 'L');
     end
 
-    disp(['generate L using: ',num2str(toc)]);
+   % disp(['generate L using: ',num2str(toc)]);
 end

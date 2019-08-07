@@ -6,7 +6,7 @@ for dataset = datasets
     rng('default');
     model.data_name = char(dataset);
     parameter_observe(model.data_name)
-    exp2_run(model);
+    %exp2_run(model);
     draw_error_curve(char(dataset));
 end
 
@@ -109,8 +109,8 @@ function draw_error_curve(data_name)
     min_level = min(errors_theta(1,:));
     step = max_level - min_level;
     ylim([min_level - 0.5 * step, max_level + 0.5 * step]);
-    ax.XTick = 0:2:10;
-    ax.XTickLabel = 0:0.2:1;    
+    ax.XTick = 0:1:10;
+    ax.XTickLabel = 0:0.1:1;    
     ytickformat('%.2f')
     legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
     ylabel('Error Rate(%)');
@@ -129,12 +129,14 @@ function draw_error_curve(data_name)
     min_level = min(errors_theta(2,:));
     step = max_level - min_level;
     ylim([min_level - 0.5 * step, max_level + 0.5 * step]);
-    ax.XTick = 0:2:10;
-    ax.XTickLabel = 0:0.2:1;    
+    ax.XTick = 0:1:10;
+    ax.XTickLabel = 0:0.1:1;    
     ytickformat('%.2f')
     legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
     ylabel('Error Rate(%)');
     xlabel('\theta / min(K, D)');
     title([data_name, ' with 100 random features']);
     hold off;
+    
+    saveas(gcf, ['../result/exp2/exp2_', data_name], 'epsc');
 end

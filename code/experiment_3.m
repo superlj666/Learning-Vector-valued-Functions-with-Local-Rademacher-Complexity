@@ -1,5 +1,5 @@
 initialization;
-model.n_repeats = 3;
+model.n_repeats = 1;
 model.T = 20;
 
 for dataset = datasets    
@@ -75,11 +75,11 @@ function exp3_run(model)
             test_all_errs{3, i_repeat, i_labeled} = model_lrc_ssl_rf_100.test_err;
 
             t = tic;
-            model_lrc_rf_100 = model_combination(i_model, model_lrc_100);
-            model_lrc_rf_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_rf_100);
+            model_lrc_100 = model_combination(i_model, model_lrc_100);
+            model_lrc_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_100);
             run_time = toc(t);
             run_times(4, i_repeat) = run_time;            
-            test_all_errs{4, i_repeat, i_labeled} = model_lrc_rf_100.test_err;
+            test_all_errs{4, i_repeat, i_labeled} = model_lrc_100.test_err;
        end
     end
      
@@ -109,8 +109,8 @@ function draw_error_curve(data_name)
     hold on;  
     plot(0:9, errors_labeled(2,:), '--', 'linewidth', 2, 'color', 'b');   
     grid on;
-    max_level = max(errors_labeled(1,:));
-    min_level = min(errors_labeled(1,:));
+    max_level = max(max(errors_labeled(1:2,:)));
+    min_level = min(min(errors_labeled(1:2,:)));
     step = max_level - min_level;
     ylim([min_level - 0.5 * step, max_level + 0.5 * step]);
     xlim([0;9]);
@@ -119,7 +119,7 @@ function draw_error_curve(data_name)
     ytickformat('%.2f')
     legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
     ylabel('Error Rate(%)');
-    xlabel('\theta / min(K, D)');
+    xlabel('Label Rate');
     title([data_name, ' in input space']);
     hold off;
     
@@ -129,8 +129,8 @@ function draw_error_curve(data_name)
     hold on;  
     plot(0:9, errors_labeled(4,:), '--', 'linewidth', 2, 'color', 'b');   
     grid on;
-    max_level = max(errors_labeled(3,:));
-    min_level = min(errors_labeled(3,:));
+    max_level = max(max(errors_labeled(3:4,:)));
+    min_level = min(min(errors_labeled(3:4,:)));
     step = max_level - min_level;
     ylim([min_level - 0.5 * step, max_level + 0.5 * step]);
     xlim([0;9]);
@@ -139,10 +139,9 @@ function draw_error_curve(data_name)
     ytickformat('%.2f')
     legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
     ylabel('Error Rate(%)');
-    xlabel('\theta / min(K, D)');
+    xlabel('Label Rate');
     title([data_name, ' with 100 random features']);
     hold off;
+    
+    saveas(gcf, ['../result/exp3/exp3_', data_name], 'epsc');
 end
-
-%experiment_2
-%error_curve_save(file_path,errors_matrix(4,:,:),errors_matrix(3,:,:), errors_matrix(2,:,:), errors_matrix(1,:,:));
