@@ -1,8 +1,9 @@
 function [optimal_paras, test_all_errs, run_times] = tune_parameters_refined(L, X, y, model)
     % rng('default');
     optimal_paras = zeros(4, 4);
+    optimal_paras(4, :) = model.varepsilon;
     test_all_errs = ones(4, model.n_repeats);
-    run_times = zeros(4, model.n_repeats);       
+    run_times = zeros(4, model.n_repeats);      
   
     % choose tau_A
     for i_tau_A = model.can_tau_A
@@ -12,7 +13,6 @@ function [optimal_paras, test_all_errs, run_times] = tune_parameters_refined(L, 
         if mean(repeat_errors) < mean(test_all_errs(1,:))
             test_all_errs(1, :) = repeat_errors;
             optimal_paras(:,1) = i_tau_A;
-            optimal_paras(4, :) = model.varepsilon;
         end
     end    
     
@@ -25,6 +25,7 @@ function [optimal_paras, test_all_errs, run_times] = tune_parameters_refined(L, 
         if mean(repeat_errors) <= mean(test_all_errs(2, :))
             test_all_errs(2, :) = repeat_errors;
             optimal_paras(2, 2) = i_tau_I;
+            break;
         end
     end  
     
@@ -35,9 +36,10 @@ function [optimal_paras, test_all_errs, run_times] = tune_parameters_refined(L, 
         model.tau_I = 0;
         repeat_errors = repeat_run(L, X, y, model);        
             
-        if mean(repeat_errors) < mean(test_all_errs(3, :))
+        if mean(repeat_errors) <= mean(test_all_errs(3, :))
             test_all_errs(3, :) = repeat_errors;
             optimal_paras(3, 3) = i_tau_S;
+            break;
         end
     end    
     
