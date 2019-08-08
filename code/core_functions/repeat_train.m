@@ -1,14 +1,8 @@
 function [test_all_errs, run_times] = repeat_train(model, X, X_rf_100, y, L)
     %% Choose parameters for our method
-    load(['../data/', model.data_name, '/', 'cross_validation_refined.mat']);
-    model_lrc_ssl_parp.tau_A = errors_validate_linear(2);
-    model_lrc_ssl_parp.tau_I = errors_validate_linear(3);
-    model_lrc_ssl_parp.tau_S = errors_validate_linear(4);
-    
-    model_lrc_ssl_100_para.tau_A = errors_validate_rf(2);
-    model_lrc_ssl_100_para.tau_I = errors_validate_rf(3);
-    model_lrc_ssl_100_para.tau_S = errors_validate_rf(4);
-    
+    load(['../result/', model.data_name, '_models.mat'], ...
+        'model_linear', 'model_lrc', 'model_ssl', 'model_lrc_ssl', ...
+        'model_linear_100', 'model_lrc_100', 'model_ssl_100', 'model_lrc_ssl_100');
     n_sample = size(y, 2);
     test_all_errs = cell(8, model.n_repeats);
     run_times = zeros(8, model.n_repeats);
@@ -33,29 +27,26 @@ function [test_all_errs, run_times] = repeat_train(model, X, X_rf_100, y, L)
         i_model.y_test = y_test;
 
         t = tic();
-        model_lrc_ssl = model_combination(i_model, model_lrc_ssl_parp);
+        model_lrc_ssl = model_combination(i_model, model_lrc_ssl);
+        model_lrc_ssl.T = 30;
         model_lrc_ssl = lsvv_multi_train(XLX, X_train, y_train, model_lrc_ssl);
         run_time = toc(t);
         run_times(1, i_repeat) = run_time;
 
         t = tic();
-        model_ssl = model_combination(i_model, model_lrc_ssl_parp);
-        model_ssl.tau_S = 0;
+        model_ssl = model_combination(i_model, model_ssl);
         model_ssl = lsvv_multi_train(XLX, X_train, y_train, model_ssl);
         run_time = toc(t);
         run_times(2, i_repeat) = run_time;
 
         t = tic();
-        model_lrc = model_combination(i_model, model_lrc_ssl_parp);
-        model_ssl.tau_I = 0;
+        model_lrc = model_combination(i_model, model_lrc);
         model_lrc = lsvv_multi_train(XLX, X_train, y_train, model_lrc);
         run_time = toc(t);
         run_times(3, i_repeat) = run_time;
 
         t = tic();
-        model_linear = model_combination(i_model, model_lrc_ssl_parp);
-        model_ssl.tau_I = 0;
-        model_ssl.tau_S = 0;
+        model_linear = model_combination(i_model, model_linear);
         model_linear = lsvv_multi_train(XLX, X_train, y_train, model_linear);
         run_time = toc(t);
         run_times(4, i_repeat) = run_time;
@@ -75,29 +66,26 @@ function [test_all_errs, run_times] = repeat_train(model, X, X_rf_100, y, L)
         i_model.X_test = X_test_100;
 
         t = tic;
-        model_lrc_ssl_rf_100 = model_combination(i_model, model_lrc_ssl_100_para);
+        model_lrc_ssl_rf_100 = model_combination(i_model, model_lrc_ssl_100);
+        model_lrc_ssl_rf_100.T = 30;
         model_lrc_ssl_rf_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_ssl_rf_100);
         run_time = toc(t);
         run_times(5, i_repeat) = run_time;
 
         t = tic();
-        model_ssl_100 = model_combination(i_model, model_lrc_ssl_100_para);
-        model_ssl_100.tau_S = 0;
+        model_ssl_100 = model_combination(i_model, model_ssl_100);
         model_ssl_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_ssl_100);
         run_time = toc(t);
         run_times(6, i_repeat) = run_time;
 
         t = tic();
-        model_lrc_100 = model_combination(i_model, model_lrc_ssl_100_para);
-        model_ssl_100.tau_I = 0;
+        model_lrc_100 = model_combination(i_model, model_lrc_100);
         model_lrc_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_lrc_100);
         run_time = toc(t);
         run_times(7, i_repeat) = run_time;
 
         t = tic();
-        model_linear_100 = model_combination(i_model, model_lrc_ssl_100_para);
-        model_ssl_100.tau_I = 0;
-        model_ssl_100.tau_S = 0;
+        model_linear_100 = model_combination(i_model, model_linear_100);
         model_linear_100 = lsvv_multi_train(XLX_100, X_train_100, y_train, model_linear_100);
         run_time = toc(t);
         run_times(8, i_repeat) = run_time;

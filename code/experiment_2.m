@@ -5,6 +5,7 @@ model.T = 30;
 for dataset = datasets    
     rng('default');
     model.data_name = char(dataset);
+    parameter_observe(model.data_name)
     exp2_run(model);
     draw_error_curve(char(dataset));
 end
@@ -27,15 +28,7 @@ function exp2_run(model)
     test_all_errs = cell(2, model.n_repeats, numel(can_theta));
     run_times = zeros(2, model.n_repeats);
     
-    load(['../data/', model.data_name, '/', 'cross_validation_refined.mat']);
-    model_lrc_ssl.tau_A = errors_validate_linear(2);
-    model_lrc_ssl.tau_I = errors_validate_linear(3);
-    model_lrc_ssl.tau_S = errors_validate_linear(4);
-    
-    model_lrc_ssl_100.tau_A = errors_validate_rf(2);
-    model_lrc_ssl_100.tau_I = errors_validate_rf(3);
-    model_lrc_ssl_100.tau_S = errors_validate_rf(4);
-    
+    load(['../result/', model.data_name, '_models.mat'], 'model_lrc_ssl', 'model_lrc_ssl_100');
     n_sample = size(y, 2);
     idx_rand = randperm(n_sample);
     for i_repeat = 1 : model.n_repeats
@@ -116,8 +109,8 @@ function draw_error_curve(data_name)
     min_level = min(errors_theta(1,:));
     step = max_level - min_level;
     ylim([min_level - 0.5 * step, max_level + 0.5 * step]);
-    ax.XTick = 0:1:10;
-    ax.XTickLabel = 0:0.1:1;    
+    ax.XTick = 0:2:10;
+    ax.XTickLabel = 0:0.2:1;    
     ytickformat('%.2f')
     legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
     ylabel('Error Rate(%)');
@@ -136,14 +129,12 @@ function draw_error_curve(data_name)
     min_level = min(errors_theta(2,:));
     step = max_level - min_level;
     ylim([min_level - 0.5 * step, max_level + 0.5 * step]);
-    ax.XTick = 0:1:10;
-    ax.XTickLabel = 0:0.1:1;    
+    ax.XTick = 0:2:10;
+    ax.XTickLabel = 0:0.2:1;    
     ytickformat('%.2f')
     legend({ 'LSVV','SS-VV', 'GRC-SS-VV'});
     ylabel('Error Rate(%)');
     xlabel('\theta / min(K, D)');
     title([data_name, ' with 100 random features']);
     hold off;
-    
-    saveas(gcf, ['../result/exp2/exp2_', data_name], 'epsc');
 end
