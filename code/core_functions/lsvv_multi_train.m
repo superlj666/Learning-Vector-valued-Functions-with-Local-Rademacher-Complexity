@@ -26,7 +26,7 @@ function model = lsvv_multi_train(XLX, X_train, y_train, model)
     %   Date : 2019 / 02 / 05
     %
     tic();
-    rng('default');
+    %rng('default');
 
     n_dimension = size(X_train, 1);
     n_sample = size(X_train, 2);
