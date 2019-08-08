@@ -1,4 +1,6 @@
 initialization;
+model.n_folds = 5;
+model.T = 19;
 
 for dataset = datasets
     rng('default');
@@ -25,9 +27,6 @@ for dataset = datasets
     fprintf('Dataset: %s, tau_A: %.0e, tau_I: %.0e, tau_S: %.0e, Error: %.2f for RF\n', model.data_name, ...
         errors_validate_rf(2), errors_validate_rf(3), errors_validate_rf(4), errors_validate_rf(1)*100);
 
-    can_tau_I = model.can_tau_I;
-    can_tau_A = model.can_tau_A;
-    can_tau_S = model.can_tau_S;
     save(['../data/', model.data_name, '/', 'cross_validation_refined.mat'], ...
         'errors_validate_linear', 'errors_validate_rf');
 end
@@ -88,7 +87,7 @@ function result_matrix = cross_validation_refined(L, X_train, y_train, model)
         current_error = 0;
         for i_fold = 1 : model.n_folds
             XLX = folds_XLX{i_fold, 1};
-
+            
             % training
             i_model = model;
             i_model.tau_A = result_matrix(2);
@@ -98,36 +97,36 @@ function result_matrix = cross_validation_refined(L, X_train, y_train, model)
             i_model.X_test = X_train(:, folds_validate{i_fold, 1});
             i_model.y_test = y_train(:, folds_validate{i_fold, 1});
             i_model = lsvv_multi_train(XLX, X_train(:, folds_train_labeled{i_fold, 1}), y_train(:, folds_train_labeled{i_fold, 1}), i_model);
-            current_error = current_error + mean(i_model.test_err(max(end-5,end) : end));            
+            current_error = current_error + mean(i_model.test_err(max(end-5,end) : end));
         end
         current_error = current_error / model.n_folds;
         if current_error < result_matrix(1)
             result_matrix(1) = current_error;
             result_matrix(3) = i_tau_I;
         end
-    end  
-    
+    end
+        
     % choose tau_S
-    for i_tau_S = model.can_tau_I
+    for i_tau_S = model.can_tau_S
         current_error = 0;
         for i_fold = 1 : model.n_folds
             XLX = folds_XLX{i_fold, 1};
-
+            
             % training
             i_model = model;
             i_model.tau_A = result_matrix(2);
-            i_model.tau_I = result_matrix(3);
+            i_model.tau_I = 0;
             i_model.tau_S = i_tau_S;
             i_model.test_batch = true;
             i_model.X_test = X_train(:, folds_validate{i_fold, 1});
             i_model.y_test = y_train(:, folds_validate{i_fold, 1});
             i_model = lsvv_multi_train(XLX, X_train(:, folds_train_labeled{i_fold, 1}), y_train(:, folds_train_labeled{i_fold, 1}), i_model);
-            current_error = current_error + mean(i_model.test_err(max(end-5,end) : end));            
+            current_error = current_error + mean(i_model.test_err(max(end-5,end) : end));
         end
         current_error = current_error / model.n_folds;
         if current_error < result_matrix(1)
             result_matrix(1) = current_error;
             result_matrix(4) = i_tau_S;
         end
-    end  
+    end
 end

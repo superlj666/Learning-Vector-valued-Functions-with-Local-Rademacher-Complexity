@@ -2,8 +2,7 @@ initialization;
 %model.n_repeats = 30;
 
 for dataset = datasets
-    model.data_name = char(dataset);
-    parameter_observe(char(dataset));
+    model.data_name = char(dataset);    
     exp1_dataset(model);
 end
 
