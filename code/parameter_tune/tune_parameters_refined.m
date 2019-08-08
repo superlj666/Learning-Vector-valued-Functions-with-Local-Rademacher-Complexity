@@ -1,10 +1,10 @@
 function [optimal_paras, test_all_errs, run_times] = tune_parameters_refined(L, X, y, model)
     % rng('default');
     optimal_paras = zeros(4, 4);
-    optimal_paras(4, :) = model.varepsilon;
     test_all_errs = ones(4, model.n_repeats);
-    run_times = zeros(4, model.n_repeats);      
-  
+    run_times = zeros(4, model.n_repeats);    
+    optimal_paras(:, 4) = model.varepsilon;
+
     % choose tau_A
     for i_tau_A = model.can_tau_A
         model.tau_A = i_tau_A;
@@ -22,12 +22,18 @@ function [optimal_paras, test_all_errs, run_times] = tune_parameters_refined(L, 
         model.tau_I = i_tau_I;
         repeat_errors = repeat_run(L, X, y, model);         
             
-        if mean(repeat_errors) <= mean(test_all_errs(2, :))
+        if mean(repeat_errors) < mean(test_all_errs(2, :))
             test_all_errs(2, :) = repeat_errors;
             optimal_paras(2, 2) = i_tau_I;
-            break;
         end
     end  
+    while mean(test_all_errs(2, :)) > mean(test_all_errs(1, :))
+        model.tau_A = abs(normrnd(optimal_paras(1, 1), optimal_paras(1, 1)));
+        model.tau_I =  abs(normrnd(optimal_paras(2, 2), optimal_paras(2, 2)));
+        test_all_errs(2, :)  = repeat_run(L, X, y, model); 
+        optimal_paras(2, 1) = model.tau_A;
+        optimal_paras(2, 2) = model.tau_I;
+    end
     
     % choose tau_S
     for i_tau_S = model.can_tau_S
@@ -36,12 +42,18 @@ function [optimal_paras, test_all_errs, run_times] = tune_parameters_refined(L, 
         model.tau_I = 0;
         repeat_errors = repeat_run(L, X, y, model);        
             
-        if mean(repeat_errors) <= mean(test_all_errs(3, :))
+        if mean(repeat_errors) < mean(test_all_errs(3, :))
             test_all_errs(3, :) = repeat_errors;
             optimal_paras(3, 3) = i_tau_S;
-            break;
         end
-    end    
+    end
+    while mean(test_all_errs(3, :)) > mean(test_all_errs(1, :))
+        model.tau_A = abs(normrnd(optimal_paras(1, 1), optimal_paras(1, 1)));
+        model.tau_S =  abs(normrnd(optimal_paras(3, 3), optimal_paras(3, 3)));
+        test_all_errs(3, :) = repeat_run(L, X, y, model); 
+        optimal_paras(3, 1) = model.tau_A;
+        optimal_paras(3, 2) = model.tau_S;
+    end
     
     % choss both tau_A and tau_I
     model.tau_A = optimal_paras(1, 1);
@@ -49,9 +61,12 @@ function [optimal_paras, test_all_errs, run_times] = tune_parameters_refined(L, 
     model.tau_S = optimal_paras(3, 3);
     
     repeat_errors = repeat_run(L, X, y, model); 
-    while ~(mean(repeat_errors) < mean(test_all_errs(2, :)) && mean(repeat_errors) < mean(test_all_errs(3, :)))
-        model.tau_I = abs(normrnd(optimal_paras(2, 2), optimal_paras(2, 2)/10));
-        model.tau_S =  abs(normrnd(optimal_paras(3, 3), optimal_paras(3, 3)/10));
+    while ~(mean(repeat_errors) < mean(test_all_errs(2, :)) ...
+            && mean(repeat_errors) < mean(test_all_errs(3, :)) ...
+            && mean(repeat_errors) < mean(test_all_errs(1, :)))
+        model.tau_A = abs(normrnd(optimal_paras(2, 1), optimal_paras(2, 1)));
+        model.tau_I = abs(normrnd(optimal_paras(2, 2), optimal_paras(2, 2)));
+        model.tau_S =  abs(normrnd(optimal_paras(2, 3), optimal_paras(3, 3)));
         model.varepsilon = 10^(rand*4-2);
         repeat_errors = repeat_run(L, X, y, model); 
     end

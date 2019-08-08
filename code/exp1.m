@@ -1,9 +1,12 @@
 initialization;
-model.n_repeats = 5;
+model.n_repeats = 10;
 model.T = 30;
-model.can_tau_I = [10.^-(1:10), 0];
 model.can_tau_A = 10.^-(3:9);
-model.can_tau_S = [10.^-(1:10), 0];
+model.can_tau_I = 10.^-(1:10);%[10.^-(1:10), 0];
+model.can_tau_S = 10.^-(1:10);%[10.^-(1:10), 0];
+model.tau_A = 0;
+model.tau_I = 0;
+model.tau_S = 0;
 
 model.varepsilon = 1; % 1 for linear, 10 for RF
 model.xi = 0.5;
@@ -31,12 +34,12 @@ for dataset = datasets
 
     save(['../result/exp1_new/', model.data_name, '_model.mat']);
 
-    test_errs = [test_all_errs_linear, test_all_errs_kernel];
+    test_errs = [test_all_errs_linear; test_all_errs_kernel];
     output(test_errs, model.data_name);
 end
 
 function output(errs, data_name)
-    errs = errs.* 100;
+    errs = errs'.* 100;
 
     errs_linear = errs(:, 1:4);
     [~, loc_min] = min(mean(errs_linear));
@@ -57,7 +60,6 @@ function output(errs, data_name)
     end
     fprintf(fid, '\\\\\n');
     fclose(fid);
-
 
     errs_kernel = errs(:, 5:8);
     [~, loc_min] = min(mean(errs_kernel));
