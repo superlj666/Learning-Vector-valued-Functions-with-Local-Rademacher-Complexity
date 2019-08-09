@@ -60,6 +60,7 @@ function [optimal_paras, test_all_errs, run_times] = tune_parameters_refined(L, 
     model.tau_I = optimal_paras(2, 2);
     model.tau_S = optimal_paras(3, 3);
     
+    model.T = 30;
     repeat_errors = repeat_run(L, X, y, model); 
     while ~(mean(repeat_errors) < mean(test_all_errs(2, :)) ...
             && mean(repeat_errors) < mean(test_all_errs(3, :)) ...
@@ -78,6 +79,7 @@ function [optimal_paras, test_all_errs, run_times] = tune_parameters_refined(L, 
 end
 
 function repeat_errors = repeat_run(L, X, y, model)
+    %rng('default');
     repeat_errors = zeros(model.n_repeats, 1);
     n_sample = size(X, 2);
     for i_repeat = 1 : model.n_repeats        
@@ -99,6 +101,6 @@ function repeat_errors = repeat_run(L, X, y, model)
         model.y_test = y_test;
         model = lsvv_multi_train(XLX, X_train, y_train, model);
         
-        repeat_errors(i_repeat) = min(model.test_err(max(end, end-5), end));
+        repeat_errors(i_repeat) = mean(model.test_err(max(end, end-3), end));
     end
 end

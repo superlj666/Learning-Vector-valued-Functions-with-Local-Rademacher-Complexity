@@ -31,7 +31,7 @@ function model = lsvv_multi_train(XLX, X_train, y_train, model)
     n_dimension = size(X_train, 1);
     n_sample = size(X_train, 2);
     if size(y_train, 1) == 1
-        n_class = max(y_train);
+        n_class = max(max(model.y_test), max(y_train));
     else
         n_class = size(y_train, 1);
     end
