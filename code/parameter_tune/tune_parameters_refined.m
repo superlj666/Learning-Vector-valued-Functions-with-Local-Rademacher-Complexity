@@ -62,8 +62,8 @@ function [optimal_paras, test_all_errs, run_times] = tune_parameters_refined(L, 
     
     model.T = 30;
     repeat_errors = repeat_run(L, X, y, model); 
-    while ~(significant_better(repeat_errors, test_all_errs(2, :), model.n_repeats)...%mean(repeat_errors) < mean(test_all_errs(2, :)) ...
-            && significant_better(repeat_errors, test_all_errs(3, :), model.n_repeats)...%&& mean(repeat_errors) < mean(test_all_errs(3, :)) ...
+    while ~(mean(repeat_errors) < mean(test_all_errs(2, :)) ...
+            && mean(repeat_errors) < mean(test_all_errs(3, :)) ...
             && significant_better(repeat_errors, test_all_errs(1, :), model.n_repeats))
             %&& mean(repeat_errors) < mean(test_all_errs(1, :)))
         model.tau_A = abs(normrnd(optimal_paras(2, 1), optimal_paras(2, 1)));
@@ -107,7 +107,7 @@ function repeat_errors = repeat_run(L, X, y, model)
 end
 
 function flag = significant_better(current, current_min, n_repeats)
-    d = abs(current - current_min');
+    d = current_min' - current;
     t = mean(d)./(std(d)/size(d,1));
     
     flag = t > refer_t_table(n_repeats);
