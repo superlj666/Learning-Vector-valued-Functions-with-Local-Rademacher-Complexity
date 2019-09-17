@@ -110,7 +110,7 @@ function draw_error_curve(data_name)
     ax = gca;
     plot(0:9, errors_labeled(1,:), '-', 'linewidth', 2, 'color', 'r');   
     hold on;  
-    plot(0:9, errors_labeled(2,:), '--', 'linewidth', 2, 'color', 'b');   
+    plot(0:9, errors_labeled(2,:), '--', 'linewidth', 2, 'color', 'm');   
     grid on;
     max_level = max(max(errors_labeled(1:2,:)));
     min_level = min(min(errors_labeled(1:2,:)));
@@ -130,7 +130,7 @@ function draw_error_curve(data_name)
     ax = gca;
     plot(0:9, errors_labeled(3,:), '-', 'linewidth', 2, 'color', 'r');   
     hold on;  
-    plot(0:9, errors_labeled(4,:), '--', 'linewidth', 2, 'color', 'b');   
+    plot(0:9, errors_labeled(4,:), '--', 'linewidth', 2, 'color', 'm');   
     grid on;
     max_level = max(max(errors_labeled(3:4,:)));
     min_level = min(min(errors_labeled(3:4,:)));

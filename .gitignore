@@ -4,6 +4,7 @@ tmp/
 datasets/
 result/
 libsvm/
+code/waste/
 
 *.xlsx
 *.txt
